@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "sourceMap": true,
+    "declaration": true,
+    "strict": true,
+    "target": "ES2022",
+    "incremental": true,
+    "paths": {
+      "@effect-rpc/router": ["./packages/router/src/index.js"],
+      "@effect-rpc/router/*": ["./packages/router/src/*.js"]
+    },
+    "composite": true
+  },
+  "exclude": ["node_modules", "dist", "build", "lib"]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@effect-rpc/router",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Tim Smart <hello@timsmart.co>",
+  "license": "MIT",
+  "devDependencies": {
+    "@effect/io": "^0.0.35",
+    "@fp-ts/data": "^0.0.26",
+    "typescript": "https://cdn.jsdelivr.net/npm/@tsplus/installer/compiler/typescript.tgz"
+  },
+  "peerDependencies": {
+    "@effect/io": "^0.0.35",
+    "@fp-ts/data": "^0.0.26"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "outDir": "dist",
+    "tsPlusConfig": "../../tsplus.config.json",
+    "tsPlusTypes": [
+      "./vendor/effect-io-tsplus.json",
+      "./vendor/fp-ts-data-tsplus.json"
+    ]
+  }
+}

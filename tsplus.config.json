@@ -1,0 +1,8 @@
+{
+  "importMap": {
+    "^(.*)/packages/([^/]*)/src/(.*)\\.js$": "@effect-rpc/$2/$3"
+  },
+  "traceMap": {
+    "^(.*)/packages/([^/]*)/src/(.*)\\.js$": "(@effect-rpc/$2) 3"
+  }
+}
