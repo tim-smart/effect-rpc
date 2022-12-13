@@ -3,10 +3,14 @@
 
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
+    "tsBuildInfoFile": ".tsbuildinfo",
     "tsPlusConfig": "../../tsplus.config.json",
     "tsPlusTypes": [
       "./vendor/effect-io-tsplus.json",
       "./vendor/fp-ts-data-tsplus.json"
     ]
-  }
+  },
+
+  "include": ["src/**/*"]
 }
