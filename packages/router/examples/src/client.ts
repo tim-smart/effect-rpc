@@ -1,12 +1,12 @@
 import { Client, makeFetchTransport } from "@effect-rpc/router"
 import { Cause, Effect, Exit, pipe } from "./common.js"
-import { routes } from "./schema.js"
+import { schema } from "./server.js"
 
 const client = Client.make(
   makeFetchTransport({
     url: "http://localhost:3000/api",
   }),
-)(routes)
+)(schema)
 
 const program = Effect.gen(function* ($) {
   console.error(yield* $(client.hello({ name: "Tim" })))

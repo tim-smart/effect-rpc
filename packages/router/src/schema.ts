@@ -6,21 +6,6 @@ export type ProcedureDefinition<E, I, O> = readonly [
   errorCodec: Codec.Codec<E>,
 ]
 
-export type ProcedureInput<
-  R extends RpcSchema,
-  N extends keyof R,
-> = R[N] extends ProcedureDefinition<any, infer I, any> ? I : never
-
-export type ProcedureError<
-  R extends RpcSchema,
-  N extends keyof R,
-> = R[N] extends ProcedureDefinition<infer E, any, any> ? E : never
-
-export type ProcedureOutput<
-  R extends RpcSchema,
-  N extends keyof R,
-> = R[N] extends ProcedureDefinition<any, any, infer O> ? O : never
-
 export interface RpcSchema {
   [name: string]:
     | ProcedureDefinition<any, any, any>

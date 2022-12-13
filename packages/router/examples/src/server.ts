@@ -1,24 +1,23 @@
 import { Server } from "@effect-rpc/router"
 import Express from "express"
 import { Effect, Exit } from "./common.js"
-import { routes } from "./schema.js"
+import * as One from "./one.js"
+import * as Two from "./two.js"
 
-const handler = Server.make(routes)({
-  hello: (i) =>
-    Effect.succeed({
-      greeting: `Hello ${i.name}`,
-    }),
-  fail: (_) =>
-    Effect.fail({
-      _tag: "Bad",
-    }),
-  multiply: ([a, b]) => Effect.succeed(a * b),
+export const schema = {
+  ...One.routes,
+  ...Two.routes,
+}
+
+const handle = Server.make(schema, {
+  ...One.handlers,
+  ...Two.handlers,
 })
 
 const app = Express()
 app.use(Express.json())
 app.post("/api", (req, res) =>
-  Effect.unsafeRunAsyncWith(handler(req.body), (exit) => {
+  Effect.unsafeRunAsyncWith(handle(req.body), (exit) => {
     if (Exit.isSuccess(exit)) {
       res.send(exit.value)
     } else {

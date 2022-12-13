@@ -1,7 +1,8 @@
-import { rpc, schema } from "@effect-rpc/router"
+import { rpc, schema, Server } from "@effect-rpc/router"
 import * as Codec from "@fp-ts/schema/Codec"
+import { Effect } from "./common.js"
 
-const one = schema({
+export const routes = schema({
   hello: rpc({
     input: Codec.struct({
       name: Codec.string,
@@ -24,15 +25,13 @@ const one = schema({
   }),
 })
 
-const another = schema({
-  multiply: rpc({
-    input: Codec.tuple(Codec.number, Codec.number),
-    output: Codec.number,
-    error: Codec.never,
-  }),
+export const handlers = Server.handlers(routes, {
+  hello: (i) =>
+    Effect.succeed({
+      greeting: `Hello ${i.name}`,
+    }),
+  fail: (_) =>
+    Effect.fail({
+      _tag: "Bad",
+    }),
 })
-
-export const routes = {
-  ...one,
-  ...another,
-}

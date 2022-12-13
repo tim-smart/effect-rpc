@@ -1,4 +1,4 @@
-export interface FetchHandlerOpts {
+export interface FetchTransportOptions {
   url: string
   headers?: Record<string, string>
 }
@@ -9,7 +9,7 @@ export class FetchError {
 }
 
 export const make =
-  ({ url, headers = {} }: FetchHandlerOpts) =>
+  ({ url, headers = {} }: FetchTransportOptions) =>
   (u: unknown) =>
     Effect.tryCatchPromise(
       () =>
@@ -20,6 +20,6 @@ export const make =
             "content-type": "application/json",
           },
           body: JSON.stringify(u),
-        }).then((r) => r.json() as unknown),
+        }).then((r) => r.json()),
       (reason) => new FetchError(reason),
     )

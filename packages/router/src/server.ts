@@ -1,8 +1,3 @@
-import * as Codec from "@fp-ts/schema/Codec"
-import * as Either from "@fp-ts/data/Either"
-import { pipe } from "@fp-ts/data/Function"
-import * as These from "@fp-ts/data/These"
-
 export type Handlers<R extends RpcSchema> = {
   [N in keyof R]: R[N] extends ProcedureDefinition<infer E, infer I, infer O>
     ? (input: I) => Effect<any, E, O>
@@ -18,9 +13,13 @@ type HandlerDeps<R extends RpcSchema, H extends Handlers<R>> = ReturnType<
 const requestCodec = rpcRequest(Codec.unknown)
 const failureJson = failure(Codec.json)
 
+export const handlers = <S extends RpcSchema, H extends Handlers<S>>(
+  _: S,
+  handlers: H,
+) => handlers
+
 export const make =
-  <R extends RpcSchema>(router: R) =>
-  <H extends Handlers<R>>(handlers: H) =>
+  <S extends RpcSchema, H extends Handlers<S>>(schema: S, handlers: H) =>
   (u: unknown) => {
     const either = Do(($) => {
       const input = $(
@@ -38,7 +37,7 @@ export const make =
 
       const [inputCodec, outputCodec, errorCodec] = $(
         pipe(
-          router[input.name],
+          schema[input.name],
           Either.fromNullable(
             (): RpcNotFound => ({
               _tag: "RpcNotFound",
@@ -87,5 +86,5 @@ export const make =
           error,
         }),
       ),
-    ) as Effect<HandlerDeps<R, H>, never, unknown>
+    ) as Effect<HandlerDeps<S, H>, never, unknown>
   }
