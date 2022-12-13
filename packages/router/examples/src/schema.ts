@@ -1,5 +1,5 @@
+import { rpc, schema } from "@effect-rpc/router"
 import * as Codec from "@fp-ts/schema/Codec"
-import { rpc, schema } from "./index.js"
 
 const one = schema({
   hello: rpc({

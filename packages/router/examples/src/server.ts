@@ -1,6 +1,7 @@
+import { Server } from "@effect-rpc/router"
 import Express from "express"
-import { routes } from "./example.js"
-import { Server } from "./index.js"
+import { Effect, Exit } from "./common.js"
+import { routes } from "./schema.js"
 
 const handler = Server.make(routes)({
   hello: (i) =>
@@ -17,7 +18,7 @@ const handler = Server.make(routes)({
 const app = Express()
 app.use(Express.json())
 app.post("/api", (req, res) =>
-  handler(req.body).unsafeRunAsyncWith((exit) => {
+  Effect.unsafeRunAsyncWith(handler(req.body), (exit) => {
     if (Exit.isSuccess(exit)) {
       res.send(exit.value)
     } else {
