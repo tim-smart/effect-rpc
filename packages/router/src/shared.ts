@@ -1,12 +1,12 @@
 import * as Codec from "@fp-ts/schema/Codec"
 import { DecodeError } from "@fp-ts/schema/DecodeError"
 
-const inputError = Codec.struct({
-  _tag: Codec.literal("InputError"),
+const decoderError = Codec.struct({
+  _tag: Codec.literal("DecoderError"),
   errors: Codec.nonEmptyArray(Codec.unknown),
 })
-export interface InputError {
-  readonly _tag: "InputError"
+export interface DecoderError {
+  readonly _tag: "DecoderError"
   readonly errors: readonly [DecodeError, ...DecodeError[]]
 }
 
@@ -17,9 +17,9 @@ const rpcNotFound = Codec.struct({
 export interface RpcNotFound extends Codec.Infer<typeof rpcNotFound> {}
 
 export const rpcError = <E>(e: Codec.Codec<E>) =>
-  Codec.union(inputError, rpcNotFound, e)
+  Codec.union(decoderError, rpcNotFound, e)
 
-export type RpcError<E> = E | InputError | RpcNotFound
+export type RpcError<E> = E | DecoderError | RpcNotFound
 
 export const success = <O>(output: Codec.Codec<O>) =>
   Codec.struct({

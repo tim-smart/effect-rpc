@@ -19,7 +19,7 @@ import type {
  */
 import type {
   RpcNotFound,
-  InputError,
+  DecoderError,
   RpcError,
   rpcResult,
   rpcRequest,

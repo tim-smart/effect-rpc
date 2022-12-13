@@ -27,12 +27,12 @@ export const make =
         pipe(
           requestCodec.decode(u),
           These.mapLeft(
-            (errors): InputError => ({
-              _tag: "InputError",
+            (errors): DecoderError => ({
+              _tag: "DecoderError",
               errors,
             }),
           ),
-          These.toEither((e, _) => Either.left(e)),
+          These.toEither((_, a) => Either.right(a)),
         ),
       )
 
@@ -54,12 +54,12 @@ export const make =
         pipe(
           inputCodec.decode(input.input),
           These.mapLeft(
-            (errors): InputError => ({
-              _tag: "InputError",
+            (errors): DecoderError => ({
+              _tag: "DecoderError",
               errors,
             }),
           ),
-          These.toEither((e, _) => Either.left(e)),
+          These.toEither((_, a) => Either.right(a)),
         ),
       )
 
