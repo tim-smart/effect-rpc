@@ -1,8 +1,9 @@
 export type Handlers<R extends RpcSchema> = {
   [N in keyof R]: R[N] extends ProcedureDefinition<infer E, infer I, infer O>
-    ? (input: I) => Effect<any, E, O>
+    ? Handler<E, I, O>
     : never
 }
+type Handler<E, I, O> = (input: I) => Effect<any, E, O>
 
 type HandlerDeps<R extends RpcSchema, H extends Handlers<R>> = ReturnType<
   H[keyof H]
@@ -12,6 +13,21 @@ type HandlerDeps<R extends RpcSchema, H extends Handlers<R>> = ReturnType<
 
 const requestCodec = rpcRequest(Codec.unknown)
 const failureJson = failure(Codec.json)
+
+export const handler =
+  <E, I, O>(_rpc: ProcedureDefinition<E, I, O>) =>
+  <R, E2 extends E>(
+    f: (
+      input: I,
+    ) => Effect<
+      R,
+      E2,
+      Exclude<E, E2> extends never
+        ? O
+        : "not all errors from the schema are used"
+    >,
+  ) =>
+    f
 
 export const handlers = <S extends RpcSchema, H extends Handlers<S>>(
   _: S,
