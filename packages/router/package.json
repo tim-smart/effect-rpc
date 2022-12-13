@@ -32,5 +32,6 @@
     "@effect/io": "^0.0.35",
     "@fp-ts/data": "^0.0.26",
     "@fp-ts/schema": "^0.0.5"
-  }
+  },
+  "sideEffects": false
 }
