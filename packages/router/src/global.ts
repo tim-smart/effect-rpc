@@ -12,7 +12,7 @@ import type {
   ProcedureInput,
   ProcedureOutput,
   ProcedureError,
-} from "@effect-rpc/router/router"
+} from "@effect-rpc/router/schema"
 
 /**
  * @tsplus global

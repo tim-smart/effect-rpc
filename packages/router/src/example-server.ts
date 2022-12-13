@@ -11,6 +11,7 @@ const handler = Server.make(routes)({
     Effect.fail({
       _tag: "Bad",
     }),
+  multiply: ([a, b]) => Effect.succeed(a * b),
 })
 
 const app = Express()

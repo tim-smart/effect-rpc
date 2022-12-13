@@ -1,31 +1,38 @@
 import * as Codec from "@fp-ts/schema/Codec"
 import { rpc, schema } from "./index.js"
 
-export const routes = schema({
-  hello: rpc(
-    // input
-    Codec.struct({
+const one = schema({
+  hello: rpc({
+    input: Codec.struct({
       name: Codec.string,
     }),
-    // output
-    Codec.struct({
+    output: Codec.struct({
       greeting: Codec.string,
     }),
-    // error
-    Codec.never,
-  ),
-  fail: rpc(
-    // input
-    Codec.struct({
+    error: Codec.never,
+  }),
+  fail: rpc({
+    input: Codec.struct({
       name: Codec.string,
     }),
-    // output
-    Codec.struct({
+    output: Codec.struct({
       greeting: Codec.string,
     }),
-    // error
-    Codec.struct({
+    error: Codec.struct({
       _tag: Codec.literal("Bad"),
     }),
-  ),
+  }),
 })
+
+const another = schema({
+  multiply: rpc({
+    input: Codec.tuple(Codec.number, Codec.number),
+    output: Codec.number,
+    error: Codec.never,
+  }),
+})
+
+export const routes = {
+  ...one,
+  ...another,
+}

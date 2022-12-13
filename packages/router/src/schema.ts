@@ -29,8 +29,12 @@ export interface RpcSchema {
 
 export const schema = <R extends RpcSchema>(definitions: R) => definitions
 
-export const rpc = <E, I, O>(
-  input: Codec.Codec<I>,
-  output: Codec.Codec<O>,
-  error: Codec.Codec<E>,
-): ProcedureDefinition<E, I, O> => [input, output, error]
+export const rpc = <E, I, O>({
+  input,
+  output,
+  error,
+}: {
+  input: Codec.Codec<I>
+  output: Codec.Codec<O>
+  error: Codec.Codec<E>
+}): ProcedureDefinition<E, I, O> => [input, output, error]
