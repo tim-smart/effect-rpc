@@ -11,7 +11,9 @@
     "incremental": true,
     "paths": {
       "@effect-rpc/router": ["./packages/router/src/index.js"],
-      "@effect-rpc/router/*": ["./packages/router/src/*.js"]
+      "@effect-rpc/router/*": ["./packages/router/src/*.js"],
+      "@effect-rpc/tsplus": ["./packages/tsplus/src/index.js"],
+      "@effect-rpc/tsplus/*": ["./packages/tsplus/src/*.js"]
     },
     "composite": true
   },

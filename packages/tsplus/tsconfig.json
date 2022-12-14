@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "tsPlusConfig": "../../tsplus.config.json",
+    "tsPlusTypes": ["./vendor/effect-io-tsplus.json"]
+  },
+
+  "include": ["src/**/*.ts"]
+}
