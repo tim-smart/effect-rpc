@@ -141,7 +141,7 @@ const errorEncoder = Derive<Encoder<RpcServerError>>()
 
 type RpcServer<H extends RpcHandlers> = (
   u: unknown,
-) => Effect<RpcHandlersDeps<H>, RpcHandlersE<H> | RpcServerError, unknown>
+) => Effect<RpcHandlersDeps<H>, never, unknown>
 
 type RpcServerFromRouter<R extends RpcRouter<any>> = R extends RpcRouter<
   infer H
