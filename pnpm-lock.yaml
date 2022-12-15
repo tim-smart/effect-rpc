@@ -36,11 +36,11 @@ importers:
       '@types/node': ^18.11.13
       typescript: https://cdn.jsdelivr.net/npm/@tsplus/installer/compiler/typescript.tgz
     dependencies:
-      '@fp-ts/data': 0.0.26
-      '@tsplus/runtime': 0.1.10
       '@tsplus/stdlib': 0.2.8
     devDependencies:
       '@effect/io': 0.0.38
+      '@fp-ts/data': 0.0.26
+      '@tsplus/runtime': 0.1.10
       '@types/node': 18.11.13
       typescript: '@cdn.jsdelivr.net/npm/@tsplus/installer/compiler/typescript.tgz'
     publishDirectory: dist
@@ -65,11 +65,9 @@ packages:
     resolution: {integrity: sha512-4D1w2WYL7w+wBcbfIhqCOtmIhU3Jyc/FbxR9imQLcTqw05sr9GKTWkXkv5Q77MHFv5MkAP5bdSkKhgsHhGhiWw==}
     dependencies:
       '@tsplus/stdlib': 0.2.8
-    dev: false
 
   /@tsplus/stdlib/0.2.8:
     resolution: {integrity: sha512-UKAN06h9V/wUflSbOU1WwACisXEi4+PHwGqR+bwxqcClrEAA8KKTTLZ0ATMbqbVAVTudE0vW4pd5iY6vGvSFBw==}
-    dev: false
 
   /@types/body-parser/1.19.2:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}

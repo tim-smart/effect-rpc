@@ -21,16 +21,18 @@
   "license": "MIT",
   "devDependencies": {
     "@effect/io": "^0.0.38",
+    "@fp-ts/data": "^0.0.26",
+    "@tsplus/runtime": "^0.1.10",
     "@types/node": "^18.11.13",
     "typescript": "https://cdn.jsdelivr.net/npm/@tsplus/installer/compiler/typescript.tgz"
   },
   "peerDependencies": {
-    "@effect/io": "^0.0.38"
+    "@effect/io": "^0.0.38",
+    "@fp-ts/data": "^0.0.26",
+    "@tsplus/runtime": "^0.1.10"
   },
   "sideEffects": false,
   "dependencies": {
-    "@fp-ts/data": "^0.0.26",
-    "@tsplus/runtime": "^0.1.10",
     "@tsplus/stdlib": "^0.2.8"
   }
 }
