@@ -6,10 +6,7 @@
     "rootDir": "src",
     "tsBuildInfoFile": ".tsbuildinfo",
     "tsPlusConfig": "../../tsplus.config.json",
-    "tsPlusTypes": [
-      "./vendor/effect-io-tsplus.json",
-      "./vendor/fp-ts-data-tsplus.json"
-    ]
+    "tsPlusTypes": ["./vendor/effect-io-tsplus.json"]
   },
 
   "include": ["src/**/*.ts"]

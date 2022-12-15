@@ -1,43 +1,51 @@
-import * as Codec from "@fp-ts/schema/Codec"
-import { DecodeError } from "@fp-ts/schema/DecodeError"
+import * as TSE from "@tsplus/stdlib/data/Either"
 
-const decoderError = Codec.struct({
-  _tag: Codec.literal("DecoderError"),
-  errors: Codec.nonEmptyArray(Codec.unknown),
-})
-export interface DecoderError {
-  readonly _tag: "DecoderError"
-  readonly errors: readonly [DecodeError, ...DecodeError[]]
+/**
+ * @tsplus implicit
+ */
+export const _unknownD = Decoder<unknown>((u) => Result.success(u))
+
+/**
+ * @tsplus implicit
+ */
+export const _unknownE = Encoder<unknown>((u) => u)
+
+export type RpcRequest = {
+  method: string
+  input: unknown
 }
 
-const rpcNotFound = Codec.struct({
-  _tag: Codec.literal("RpcNotFound"),
-  name: Codec.string,
-})
-export interface RpcNotFound extends Codec.Infer<typeof rpcNotFound> {}
+export interface RpcNotFound {
+  readonly _tag: "RpcNotFound"
+  readonly method: string
+}
 
-export const rpcError = <E>(e: Codec.Codec<E>) =>
-  Codec.union(decoderError, rpcNotFound, e)
+export type RpcServerError = DecodePayloadFailure | RpcNotFound
 
-export type RpcError<E> = E | DecoderError | RpcNotFound
+export type RpcResponse = TSE.Either<unknown, unknown>
 
-export const success = <O>(output: Codec.Codec<O>) =>
-  Codec.struct({
-    _tag: Codec.literal("success"),
-    value: output,
-  })
+// Codecs
 
-export const failure = <E>(e: Codec.Codec<E>) =>
-  Codec.struct({
-    _tag: Codec.literal("failure"),
-    error: rpcError(e),
-  })
+export interface RpcSharedCodecNoInput<E, O> {
+  output: Encoder<O> & Decoder<O>
+  error: Encoder<E> & Decoder<E>
+}
 
-export const rpcRequest = <I>(a: Codec.Codec<I>) =>
-  Codec.struct({
-    name: Codec.string,
-    input: a,
-  })
+export interface RpcSharedCodecWithInput<E, I, O>
+  extends RpcSharedCodecNoInput<E, O> {
+  input: Decoder<I> & Encoder<I>
+}
 
-export const rpcResult = <E, O>(e: Codec.Codec<E>, a: Codec.Codec<O>) =>
-  Codec.union(success(a), failure(e))
+export type RpcSharedCodec<E, I, O> =
+  | RpcSharedCodecNoInput<E, O>
+  | RpcSharedCodecWithInput<E, I, O>
+
+export interface RpcSharedCodecs
+  extends Record<
+    string,
+    | RpcSharedCodec<any, any, any>
+    | RpcSharedCodec<never, any, any>
+    | RpcSharedCodec<any, never, any>
+  > {}
+
+export const makeCodecs = <S extends RpcSharedCodecs>(codecs: S) => codecs

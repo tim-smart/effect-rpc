@@ -3561,6 +3561,22 @@
       ]
     },
     {
+      "definitionName": "dropUntil",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "pipeable",
+          "typeName": "Iterable",
+          "name": "dropUntil"
+        },
+        {
+          "kind": "static",
+          "typeName": "effect/io/Effect.Ops",
+          "name": "dropUntil"
+        }
+      ]
+    },
+    {
       "definitionName": "dropWhile",
       "definitionKind": "const",
       "extensions": [
@@ -7748,6 +7764,17 @@
       ]
     },
     {
+      "definitionName": "currentScheduler",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/FiberRef.Ops",
+          "name": "currentScheduler"
+        }
+      ]
+    },
+    {
       "definitionName": "currentSupervisor",
       "definitionKind": "const",
       "extensions": [
@@ -9704,6 +9731,83 @@
       ]
     },
     {
+      "definitionName": "capacity",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Queue.Ops",
+          "name": "capacity"
+        }
+      ]
+    },
+    {
+      "definitionName": "size",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Queue.Ops",
+          "name": "size"
+        }
+      ]
+    },
+    {
+      "definitionName": "isEmpty",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Queue.Ops",
+          "name": "isEmpty"
+        }
+      ]
+    },
+    {
+      "definitionName": "isFull",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Queue.Ops",
+          "name": "isFull"
+        }
+      ]
+    },
+    {
+      "definitionName": "isShutdown",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Queue.Ops",
+          "name": "isShutdown"
+        }
+      ]
+    },
+    {
+      "definitionName": "awaitShutdown",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Queue.Ops",
+          "name": "awaitShutdown"
+        }
+      ]
+    },
+    {
+      "definitionName": "shutdown",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Queue.Ops",
+          "name": "shutdown"
+        }
+      ]
+    },
+    {
       "definitionName": "EnqueueTypeId",
       "definitionKind": "const",
       "extensions": [
@@ -9798,83 +9902,6 @@
           "kind": "pipeable",
           "typeName": "effect/io/Queue.Dequeue",
           "name": "takeN"
-        }
-      ]
-    },
-    {
-      "definitionName": "capacity",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "getter",
-          "typeName": "effect/io/Queue",
-          "name": "capacity"
-        }
-      ]
-    },
-    {
-      "definitionName": "size",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "getter",
-          "typeName": "effect/io/Queue",
-          "name": "size"
-        }
-      ]
-    },
-    {
-      "definitionName": "isEmpty",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "getter",
-          "typeName": "effect/io/Queue",
-          "name": "isEmpty"
-        }
-      ]
-    },
-    {
-      "definitionName": "isFull",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "getter",
-          "typeName": "effect/io/Queue",
-          "name": "isFull"
-        }
-      ]
-    },
-    {
-      "definitionName": "isShutdown",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "getter",
-          "typeName": "effect/io/Queue",
-          "name": "isShutdown"
-        }
-      ]
-    },
-    {
-      "definitionName": "awaitShutdown",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "getter",
-          "typeName": "effect/io/Queue",
-          "name": "awaitShutdown"
-        }
-      ]
-    },
-    {
-      "definitionName": "shutdown",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "getter",
-          "typeName": "effect/io/Queue",
-          "name": "shutdown"
         }
       ]
     },
@@ -11660,20 +11687,6 @@
   ],
   "@effect/io/Scheduler": [
     {
-      "definitionName": "Task",
-      "definitionKind": "interface",
-      "extensions": [
-        {
-          "kind": "type",
-          "typeName": "effect/io/Scheduler.Task"
-        },
-        {
-          "kind": "companion",
-          "typeName": "effect/io/Scheduler.Task.Ops"
-        }
-      ]
-    },
-    {
       "definitionName": "Scheduler",
       "definitionKind": "interface",
       "extensions": [
@@ -11688,13 +11701,16 @@
       ]
     },
     {
-      "definitionName": "defaultScheduler",
-      "definitionKind": "const",
+      "definitionName": "Task",
+      "definitionKind": "type",
       "extensions": [
         {
-          "kind": "static",
-          "typeName": "effect/io/Scheduler.Ops",
-          "name": "defaultScheduler"
+          "kind": "type",
+          "typeName": "effect/io/Scheduler.Task"
+        },
+        {
+          "kind": "companion",
+          "typeName": "effect/io/Scheduler.Task.Ops"
         }
       ]
     }
