@@ -1,5 +1,5 @@
 import { Client, makeFetchTransport } from "@effect-rpc/router"
-import { Router } from "./router.js"
+import type { Router } from "./router.js"
 import * as Effect from "@effect/io/Effect"
 import * as Exit from "@effect/io/Exit"
 import * as Cause from "@effect/io/Cause"
