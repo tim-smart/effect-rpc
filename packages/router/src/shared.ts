@@ -10,6 +10,16 @@ export const _unknownD = Decoder<unknown>((u) => Result.success(u))
  */
 export const _unknownE = Encoder<unknown>((u) => u)
 
+/**
+ * @tsplus implicit
+ */
+export const _voidD = Decoder<void>(() => Result.success(undefined))
+
+/**
+ * @tsplus implicit
+ */
+export const _voidE = Encoder<void>(() => {})
+
 export type RpcRequest = {
   method: string
   input: unknown
