@@ -6,6 +6,7 @@ const router = Server.router(
     hello: (name: string) =>
       Effect.succeed({
         greeting: `Hello ${name}!`,
+        sentAt: new Date(),
       }),
 
     fail: Effect.fail({
