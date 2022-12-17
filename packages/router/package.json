@@ -14,13 +14,18 @@
   },
   "exports": {
     ".": "./index.js",
+    "./client": "./client.js",
+    "./server": "./server.js",
+    "./transport": "./transport.js",
+    "./tsplus/client": "./tsplus/client.js",
+    "./tsplus/server": "./tsplus/server.js",
     "./*": "./*.js"
   },
   "keywords": [],
   "author": "Tim Smart <hello@timsmart.co>",
   "license": "MIT",
   "devDependencies": {
-    "@effect/io": "^0.0.38",
+    "@effect/io": "^0.0.39",
     "@fp-ts/data": "^0.0.26",
     "@tsplus/runtime": "^0.1.10",
     "@types/node": "^18.11.13",

@@ -29,7 +29,7 @@ importers:
 
   packages/router:
     specifiers:
-      '@effect/io': ^0.0.38
+      '@effect/io': ^0.0.39
       '@fp-ts/data': ^0.0.26
       '@tsplus/runtime': ^0.1.10
       '@tsplus/stdlib': ^0.2.8
@@ -38,7 +38,7 @@ importers:
     dependencies:
       '@tsplus/stdlib': 0.2.8
     devDependencies:
-      '@effect/io': 0.0.38
+      '@effect/io': 0.0.39
       '@fp-ts/data': 0.0.26
       '@tsplus/runtime': 0.1.10
       '@types/node': 18.11.13
@@ -52,6 +52,14 @@ packages:
     dependencies:
       '@fp-ts/core': 0.0.9
       '@fp-ts/data': 0.0.26
+    dev: false
+
+  /@effect/io/0.0.39:
+    resolution: {integrity: sha512-JVcKYevmppJc6FIq3GakfNM+UUYAac+FgahTxNvdeCyu/JayL+Ly69HWSo7RU/19mqSdL5Q8eFk7ktUCbANeUQ==}
+    dependencies:
+      '@fp-ts/core': 0.0.9
+      '@fp-ts/data': 0.0.26
+    dev: true
 
   /@fp-ts/core/0.0.9:
     resolution: {integrity: sha512-FuXKPHTEvvgxV3LulGJXkSpAghovh7wLxux+Pm9LKefC0gtZZQ4OajTjTK5RsQtpyKIsAn26PwdG6W6zksF/UA==}
