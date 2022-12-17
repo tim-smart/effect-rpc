@@ -137,7 +137,7 @@ export const makeHandler =
         : handler(input as never)
 
       return effect
-        .map((a) => TSE.right(codec.output.encode(a)))
+        .map((a) => TSE.right(codec.output.encode(a as never)))
         .catchAll((e) =>
           Effect.succeed(TSE.left(codec.error.encode(e as never))),
         )
