@@ -1,7 +1,7 @@
-import { Server } from "@effect-rpc/router"
+import { makeHandler, makeRouter } from "@effect-rpc/router/tsplus/server"
 import * as Effect from "@effect/io/Effect"
 
-const router = Server.router(
+const router = makeRouter(
   {
     hello: (name: string) =>
       Effect.succeed({
@@ -18,4 +18,4 @@ const router = Server.router(
 
 export type Router = typeof router
 
-export const handler = Server.makeFromRouter(router)
+export const handler = makeHandler(router)

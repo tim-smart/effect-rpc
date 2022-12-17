@@ -13,7 +13,7 @@ export type RpcDefinition<R, E, I, O> =
 export type RpcDefinitionAny =
   | RpcDefinition<any, any, any, any>
   | RpcDefinition<any, never, any, any>
-  | RpcDefinition<any, any, never, any>
+  | RpcDefinition<any, any, any, never>
 
 export type RpcDefinitionIO<R, E, I, O> = (input: I) => Effect<R, E, O>
 
@@ -40,7 +40,7 @@ export type RpcHandlerCodec<E, I, O> =
 export type RpcHandlerCodecAny =
   | RpcHandlerCodec<any, any, any>
   | RpcHandlerCodec<never, any, any>
-  | RpcHandlerCodec<any, never, any>
+  | RpcHandlerCodec<any, any, never>
 
 export type RpcHandlerCodecFromDefinition<
   D extends RpcDefinition<any, any, any, any>,

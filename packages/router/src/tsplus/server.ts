@@ -2,12 +2,12 @@ import * as S from "../server.js"
 
 export { makeHandler } from "../server.js"
 
-interface RpcRouter<H extends S.RpcHandlers> extends S.RpcRouterBase {
+export interface RpcRouter<H extends S.RpcHandlers> extends S.RpcRouterBase {
   readonly handlers: H
   readonly codecs: RpcCodecsFromHandlers<H>
 }
 
-type RpcCodecsFromHandlers<H extends S.RpcHandlers> = {
+export type RpcCodecsFromHandlers<H extends S.RpcHandlers> = {
   [K in keyof H]: H[K] extends Effect<any, infer E, infer O>
     ? S.RpcHandlerCodecNoInput<E, O>
     : H[K] extends S.RpcDefinitionIO<any, infer E, infer I, infer O>
