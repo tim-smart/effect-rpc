@@ -1,14 +1,7 @@
 import * as TSE from "@tsplus/stdlib/data/Either"
-import {
-  RpcHandlerCodecNoInput,
-  RpcHandlerCodecWithInput,
-  RpcRouter,
-} from "./server.js"
+import { RpcHandlerCodecNoInput, RpcHandlerCodecWithInput } from "./server.js"
 import { RpcRequest, RpcResponse, RpcServerError } from "./shared.js"
 
-/**
- * @tsplus type Rpc
- */
 export type Rpc<C extends RpcCodec<any>, TR, TE> = C extends RpcCodecWithInput<
   infer E,
   infer I,
@@ -29,7 +22,7 @@ interface RpcCodecWithInput<E, I, O> extends RpcCodecNoInput<E, O> {
 }
 
 /**
- * @tsplus type RpcCodec
+ * @tsplus type effect-rpc/router/RpcCodec
  * @tsplus derive nominal
  */
 export type RpcCodec<
@@ -46,53 +39,10 @@ export type RpcCodec<
   ? RpcCodecNoInput<E, O>
   : never
 
-/**
- * @tsplus derive RpcCodec[RpcHandlerCodecWithInput]<_, _, _, _> 10
- */
-export const deriveRpcCodec = <
-  A extends RpcHandlerCodecWithInput<any, any, any>,
->(
-  ...[input, output, error]: [A] extends [
-    RpcHandlerCodecWithInput<infer _E, infer _I, infer _O>,
-  ]
-    ? Check.IsEqual<A, RpcHandlerCodecWithInput<_E, _I, _O>> extends [never]
-      ? never
-      : [input: Encoder<_I>, output: Decoder<_O>, error: Decoder<_E>]
-    : never
-): RpcCodec<A> => {
-  return {
-    input,
-    output,
-    error,
-  } as any
-}
-
 export interface RpcCodecs extends Record<string, RpcCodec<any>> {}
-
-export type RpcCodecsFromRouter<R extends RpcRouter<any>> = {
-  [K in keyof R["codecs"]]: RpcCodec<R["codecs"][K]>
-}
 
 export type RpcClient<S extends RpcCodecs, TR, TE> = {
   [K in keyof S]: Rpc<S[K], TR, TE>
-}
-
-/**
- * @tsplus derive RpcCodec[RpcHandlerCodecNoInput]<_, _, _, _> 10
- */
-export const deriveRpcCodecEffect = <
-  A extends RpcHandlerCodecNoInput<any, any>,
->(
-  ...[output, error]: [A] extends [RpcHandlerCodecNoInput<infer _E, infer _O>]
-    ? Check.IsEqual<A, RpcHandlerCodecNoInput<_E, _O>> extends [never]
-      ? never
-      : [output: Decoder<_O>, error: Decoder<_E>]
-    : never
-): RpcCodec<A> => {
-  return {
-    output,
-    error,
-  } as any
 }
 
 export interface RpcClientTransport<R, E> {
@@ -123,11 +73,6 @@ export const make = <
     }),
     {} as any,
   )
-
-export const makeFromRouter =
-  <R extends RpcRouter<any>>(codecs: RpcCodecsFromRouter<R>) =>
-  <TR, TE>(transport: RpcClientTransport<TR, TE>) =>
-    make(codecs, transport)
 
 const makeRpc = <C extends RpcCodec<any>, TR, TE>(
   transport: RpcClientTransport<TR, TE>,

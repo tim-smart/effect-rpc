@@ -6,20 +6,19 @@ import {
   RpcResponse,
 } from "./shared.js"
 
-/**
- * @tsplus type RpcDefinition
- */
 export type RpcDefinition<R, E, I, O> =
   | RpcDefinitionIO<R, E, I, O>
   | Effect<R, E, O>
 
-/**
- * @tsplus type RpcDefinitionIO
- */
+export type RpcDefinitionAny =
+  | RpcDefinition<any, any, any, any>
+  | RpcDefinition<any, never, any, any>
+  | RpcDefinition<any, any, never, any>
+
 export type RpcDefinitionIO<R, E, I, O> = (input: I) => Effect<R, E, O>
 
 /**
- * @tsplus type RpcHandlerCodecNoInput
+ * @tsplus type effect-rpc/router/RpcHandlerCodecNoInput
  */
 export interface RpcHandlerCodecNoInput<E, O> {
   output: Encoder<O>
@@ -27,7 +26,7 @@ export interface RpcHandlerCodecNoInput<E, O> {
 }
 
 /**
- * @tsplus type RpcHandlerCodecWithInput
+ * @tsplus type effect-rpc/router/RpcHandlerCodecWithInput
  */
 export interface RpcHandlerCodecWithInput<E, I, O>
   extends RpcHandlerCodecNoInput<E, O> {
@@ -58,63 +57,17 @@ export type RpcDefinitionFromCodec<C extends RpcHandlerCodecAny> =
     ? Effect<any, E, O>
     : never
 
-/**
- * @tsplus derive RpcHandlerCodecWithInput<_, _, _> 10
- */
-export const deriveRpcHandlerCodecWithInput = <E, I, O>(
-  ...[input, output, error]: [
-    input: Decoder<I>,
-    output: Encoder<O>,
-    error: Encoder<E>,
-  ]
-): RpcHandlerCodecWithInput<E, I, O> => {
-  return {
-    input,
-    output,
-    error,
-  }
-}
-
-/**
- * @tsplus derive RpcHandlerCodecNoInput<_, _> 10
- */
-export const deriveRpcHandlerCodecNoInput = <E, O>(
-  ...[output, error]: [output: Encoder<O>, error: Encoder<E>]
-): RpcHandlerCodecNoInput<E, O> => {
-  return {
-    output,
-    error,
-  }
-}
-
 export interface RpcHandler<D extends RpcDefinition<any, any, any, any>> {
   definition: D
   codec: RpcHandlerCodecFromDefinition<D>
 }
 
-export const rpc = <
-  C extends RpcHandlerCodec<any, any, any>,
-  D extends RpcDefinitionFromCodec<C>,
->(
-  _: C,
-  definition: D,
-) => definition
-
 export interface RpcHandlerCodecs extends Record<string, RpcHandlerCodecAny> {}
 
-export interface RpcHandlers
-  extends Record<string, RpcDefinition<any, any, any, any>> {}
+export interface RpcHandlers extends Record<string, RpcDefinitionAny> {}
 
 export type RpcHandlersFromCodecs<S extends RpcHandlerCodecs> = {
   [K in keyof S]: RpcDefinitionFromCodec<S[K]>
-}
-
-type RpcCodecsFromHandlers<H extends RpcHandlers> = {
-  [K in keyof H]: H[K] extends Effect<any, infer E, infer O>
-    ? RpcHandlerCodecNoInput<E, O>
-    : H[K] extends RpcDefinitionIO<any, infer E, infer I, infer O>
-    ? RpcHandlerCodecWithInput<E, I, O>
-    : never
 }
 
 export type RpcHandlersDeps<H extends RpcHandlers> =
@@ -123,43 +76,40 @@ export type RpcHandlersDeps<H extends RpcHandlers> =
 export type RpcHandlersE<H extends RpcHandlers> =
   H[keyof H] extends RpcDefinition<any, infer E, any, any> ? E : never
 
-export interface RpcRouter<H extends RpcHandlers> {
-  readonly handlers: H
-  readonly codecs: RpcCodecsFromHandlers<H>
+export interface RpcRouterBase {
+  readonly handlers: RpcHandlers
+  readonly codecs: RpcHandlerCodecs
 }
-export const router = <H extends RpcHandlers>(
-  handlers: H,
-  codecs: RpcCodecsFromHandlers<H>,
-): RpcRouter<H> => ({
-  handlers,
-  codecs,
-})
+
+export interface RpcRouter<C extends RpcHandlerCodecs> extends RpcRouterBase {
+  readonly codecs: C
+  readonly handlers: RpcHandlersFromCodecs<C>
+}
 
 const requestDecoder = Derive<Decoder<RpcRequest>>()
 const responseEncoder = Derive<Encoder<RpcResponse>>()
 const errorEncoder = Derive<Encoder<RpcServerError>>()
 
-type RpcServer<H extends RpcHandlers> = (
+export type RpcServer<H extends RpcHandlers> = (
   u: unknown,
 ) => Effect<RpcHandlersDeps<H>, never, unknown>
 
-type RpcServerFromRouter<R extends RpcRouter<any>> = R extends RpcRouter<
-  infer H
->
-  ? RpcServer<H>
-  : never
+export const makeRouter = <C extends RpcHandlerCodecs>(
+  codecs: C,
+  handlers: RpcHandlersFromCodecs<C>,
+): RpcRouter<C> => ({
+  codecs,
+  handlers,
+})
 
-export const make =
-  <R extends RpcHandlerCodecs, H extends RpcHandlersFromCodecs<R>>(
-    schema: R,
-    handlers: H,
-  ): RpcServer<H> =>
+export const makeHandler =
+  <R extends RpcRouterBase>(router: R): RpcServer<R["handlers"]> =>
   (u) =>
     Do(($) => {
       const request = $(requestDecoder.decode(u))
       const codec = $(
         TSE.fromNullable(
-          schema[request.method],
+          router.codecs[request.method],
           (): RpcNotFound => ({
             _tag: "RpcNotFound",
             method: request.method,
@@ -168,7 +118,7 @@ export const make =
       )
       const handler = $(
         TSE.fromNullable(
-          handlers[request.method],
+          router.handlers[request.method],
           (): RpcNotFound => ({
             _tag: "RpcNotFound",
             method: request.method,
@@ -198,7 +148,3 @@ export const make =
         ),
       (a) => a,
     ) as any
-
-export const makeFromRouter = <R extends RpcRouter<any>>(
-  router: R,
-): RpcServerFromRouter<R> => make(router.codecs, router.handlers) as any
