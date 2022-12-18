@@ -9,8 +9,7 @@ tsc: clean
 .PHONY: publish
 publish: tsc
 	sed 's#/dist/#/#' package.json > dist/package.json
-	cd dist
-	npm publish
+	cd dist && npm publish
 
 .PHONY: publish
 publish-dry: tsc
