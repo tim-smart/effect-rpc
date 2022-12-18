@@ -1,27 +1,23 @@
 {
   "name": "@effect-rpc/router",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
-  "description": "",
+  "description": "Simple RPC system for effect/io",
   "publishConfig": {
-    "access": "public",
-    "directory": "dist"
+    "access": "public"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "rm -rf dist .tsbuildinfo",
-    "prepublishOnly": "pnpm run clean && tsc && cp package.json dist/package.json"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "exports": {
-    ".": "./index.js",
-    "./client": "./client.js",
-    "./server": "./server.js",
-    "./transport": "./transport.js",
-    "./tsplus/client": "./tsplus/client.js",
-    "./tsplus/server": "./tsplus/server.js",
-    "./*": "./*.js"
+    ".": "./dist/index.js",
+    "./client": "./dist/client.js",
+    "./server": "./dist/server.js",
+    "./transport": "./dist/transport.js",
+    "./tsplus/client": "./dist/tsplus/client.js",
+    "./tsplus/server": "./dist/tsplus/server.js",
+    "./*": "./dist/*.js"
   },
-  "keywords": [],
   "author": "Tim Smart <hello@timsmart.co>",
   "license": "MIT",
   "devDependencies": {
@@ -36,8 +32,8 @@
     "@fp-ts/data": "^0.0.26",
     "@tsplus/runtime": "^0.1.10"
   },
-  "sideEffects": false,
   "dependencies": {
     "@tsplus/stdlib": "^0.2.8"
-  }
+  },
+  "sideEffects": false
 }
