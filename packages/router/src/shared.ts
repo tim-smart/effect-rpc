@@ -1,4 +1,6 @@
 import * as TSE from "@tsplus/stdlib/data/Either"
+import { Deferred } from "@effect/io/Deferred"
+import * as D from "@effect/io/Deferred"
 
 /**
  * @tsplus implicit
