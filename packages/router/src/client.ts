@@ -22,6 +22,16 @@ interface RpcCodecWithInput<E, I, O> extends RpcCodecNoInput<E, O> {
   readonly input: Encoder<I>
 }
 
+type RpcCodecOutput<C extends RpcCodec<any>> = C extends RpcCodecWithInput<
+  any,
+  any,
+  infer O
+>
+  ? O
+  : C extends RpcCodecNoInput<any, infer O>
+  ? O
+  : never
+
 /**
  * @tsplus type effect-rpc/router/RpcCodec
  * @tsplus derive nominal
@@ -44,7 +54,13 @@ export interface RpcCodecs extends Record<string, RpcCodec<any>> {}
 
 export type RpcClient<S extends RpcCodecs, TR, TE> = {
   [K in keyof S]: Rpc<S[K], TR, TE>
-} & { _codecs: S }
+} & {
+  _codecs: S
+  _unsafeDecode: <M extends keyof S>(
+    method: M,
+    output: unknown,
+  ) => RpcCodecOutput<S[M]>
+}
 
 export interface RpcClientTransport<R, E> {
   send: (u: unknown) => Effect<R, E, unknown>
@@ -53,6 +69,17 @@ export interface RpcClientTransport<R, E> {
 const requestEncoder = Derive<Encoder<RpcRequest>>()
 const responseDecoder = Derive<Decoder<RpcResponse>>()
 const errorDecoder = Derive<Decoder<RpcServerError>>()
+
+const unsafeDecode =
+  <S extends RpcCodecs>(codecs: S) =>
+  (method: keyof S, output: unknown) => {
+    const a = codecs[method].output.decodeResult(output)
+    if (a._tag !== "Failure") {
+      return a.success
+    }
+
+    throw "unsafeDecode fail"
+  }
 
 export const make = <
   S extends RpcCodecs,
@@ -72,7 +99,7 @@ export const make = <
       ...acc,
       [method]: makeRpc(transport, codec, method),
     }),
-    { _codecs: codecs } as any,
+    { _codecs: codecs, _unsafeDecode: unsafeDecode(codecs) } as any,
   )
 
 const makeRpc = <C extends RpcCodec<any>, TR, TE>(
