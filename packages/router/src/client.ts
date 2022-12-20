@@ -1,4 +1,5 @@
 import * as TSE from "@tsplus/stdlib/data/Either"
+import * as Eq from "@fp-ts/data/Equal"
 import { RpcHandlerCodecNoInput, RpcHandlerCodecWithInput } from "./server.js"
 import { RpcRequest, RpcResponse, RpcServerError } from "./shared.js"
 
@@ -107,7 +108,17 @@ const makeRpc = <C extends RpcCodec<any>, TR, TE>(
       )
 
   if ("input" in codec) {
-    return ((input: any) => send(codec.input.encode(input))) as any
+    const cache = new Map<number, Effect<unknown, unknown, unknown>>()
+    return ((input: any) => {
+      const hash = Eq.hash(input)
+      if (cache.has(hash)) {
+        return cache.get(hash)
+      }
+
+      const effect = send(input)
+      cache.set(hash, effect)
+      return effect
+    }) as any
   }
 
   return send(null) as any
