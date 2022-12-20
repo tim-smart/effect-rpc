@@ -50,9 +50,9 @@ export type RpcClient<S extends RpcCodecs, TR, TE> = {
   [K in keyof S]: Rpc<S[K], TR, TE>
 } & {
   _codecs: S
-  _unsafeDecode: <M extends keyof S>(
+  _unsafeDecode: <M extends keyof S, O extends UndecodedRpcResponse<M>>(
     method: M,
-    output: UndecodedRpcResponse<M>,
+    output: O,
   ) => S[M] extends { output: Decoder<infer O> } ? O : never
 }
 
@@ -66,7 +66,7 @@ const errorDecoder = Derive<Decoder<RpcServerError>>()
 
 const unsafeDecode =
   <S extends RpcCodecs>(codecs: S) =>
-  <M extends keyof S>(method: M, output: UndecodedRpcResponse<M>) => {
+  (method: keyof S, output: unknown) => {
     const a = codecs[method].output.decodeResult(output)
     if (a._tag !== "Failure") {
       return a.success
