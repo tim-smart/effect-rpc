@@ -175,7 +175,7 @@ export const makeUndecodedClient = <
   codecs: C,
   handlers: H,
 ) =>
-  Object.entries(handlers).reduce<RpcUndecodedClient<H>>(
+  Object.entries(handlers as RpcHandlers).reduce<RpcUndecodedClient<H>>(
     (acc, [method, definition]) => {
       const codec = codecs[method]
       return {
