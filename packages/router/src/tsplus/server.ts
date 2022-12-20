@@ -9,13 +9,10 @@ export type RpcCodecsFromHandlers<H extends S.RpcHandlers> = {
     ? S.RpcHandlerCodecWithInput<E, I, O>
     : never
 }
-export const makeRouter = <
-  H extends S.RpcHandlers,
-  C extends RpcCodecsFromHandlers<H>,
->(
+export const makeRouter = <H extends S.RpcHandlers>(
   handlers: H,
-  codecs: C,
-): S.RpcRouter<C, H> => ({
+  codecs: RpcCodecsFromHandlers<H>,
+): S.RpcRouter<RpcCodecsFromHandlers<H>, H> => ({
   handlers,
   codecs,
   undecoded: S.makeUndecodedClient(codecs, handlers as any),
