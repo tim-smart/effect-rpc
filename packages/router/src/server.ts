@@ -148,3 +148,25 @@ export const makeHandler =
         ),
       (a) => a,
     ) as any
+
+export type RpcServerClient<H extends RpcHandlers> = {
+  [K in keyof H]: H[K] extends RpcDefinitionIO<infer R, infer E, infer I, any>
+    ? (input: I) => Effect<R, E, unknown>
+    : H[K] extends Effect<infer R, infer E, any>
+    ? Effect<R, E, unknown>
+    : never
+}
+
+export const makeServerClient = <R extends RpcRouterBase>(router: R) =>
+  Object.entries(router.handlers).reduce<RpcServerClient<R["handlers"]>>(
+    (acc, [method, definition]) => {
+      const codec = router.codecs[method]
+      return {
+        ...acc,
+        [method]: Effect.isEffect(definition)
+          ? definition.map(codec.output.encode as any)
+          : (input) => definition(input).map(codec.output.encode as any),
+      }
+    },
+    {} as any,
+  )
