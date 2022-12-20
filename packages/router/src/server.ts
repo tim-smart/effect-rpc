@@ -149,11 +149,15 @@ export const makeHandler =
       (a) => a,
     ) as any
 
+export interface UndecodedRpcResponse<M> {
+  __rpc: M
+}
+
 export type RpcServerClient<H extends RpcHandlers> = {
   [K in keyof H]: H[K] extends RpcDefinitionIO<infer R, infer E, infer I, any>
-    ? (input: I) => Effect<R, E, unknown>
+    ? (input: I) => Effect<R, E, UndecodedRpcResponse<K>>
     : H[K] extends Effect<infer R, infer E, any>
-    ? Effect<R, E, unknown>
+    ? Effect<R, E, UndecodedRpcResponse<K>>
     : never
 }
 

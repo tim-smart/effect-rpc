@@ -1,6 +1,10 @@
 import * as TSE from "@tsplus/stdlib/data/Either"
 import * as Eq from "@fp-ts/data/Equal"
-import { RpcHandlerCodecNoInput, RpcHandlerCodecWithInput } from "./server.js"
+import {
+  RpcHandlerCodecNoInput,
+  RpcHandlerCodecWithInput,
+  UndecodedRpcResponse,
+} from "./server.js"
 import { RpcRequest, RpcResponse, RpcServerError } from "./shared.js"
 
 export type Rpc<C extends RpcCodec<any>, TR, TE> = C extends RpcCodecWithInput<
@@ -62,7 +66,7 @@ const errorDecoder = Derive<Decoder<RpcServerError>>()
 
 const unsafeDecode =
   <S extends RpcCodecs>(codecs: S) =>
-  (method: keyof S, output: unknown) => {
+  <M extends keyof S>(method: M, output: UndecodedRpcResponse<M>) => {
     const a = codecs[method].output.decodeResult(output)
     if (a._tag !== "Failure") {
       return a.success
