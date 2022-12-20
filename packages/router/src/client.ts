@@ -22,16 +22,6 @@ interface RpcCodecWithInput<E, I, O> extends RpcCodecNoInput<E, O> {
   readonly input: Encoder<I>
 }
 
-type RpcCodecOutput<C extends RpcCodec<any>> = C extends RpcCodecWithInput<
-  any,
-  any,
-  infer O
->
-  ? O
-  : C extends RpcCodecNoInput<any, infer O>
-  ? O
-  : never
-
 /**
  * @tsplus type effect-rpc/router/RpcCodec
  * @tsplus derive nominal
@@ -59,7 +49,7 @@ export type RpcClient<S extends RpcCodecs, TR, TE> = {
   _unsafeDecode: <M extends keyof S>(
     method: M,
     output: unknown,
-  ) => RpcCodecOutput<S[M]>
+  ) => S[M] extends { output: Decoder<infer O> } ? O : never
 }
 
 export interface RpcClientTransport<R, E> {
