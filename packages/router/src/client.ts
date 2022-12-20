@@ -44,7 +44,7 @@ export interface RpcCodecs extends Record<string, RpcCodec<any>> {}
 
 export type RpcClient<S extends RpcCodecs, TR, TE> = {
   [K in keyof S]: Rpc<S[K], TR, TE>
-}
+} & { _codecs: S }
 
 export interface RpcClientTransport<R, E> {
   send: (u: unknown) => Effect<R, E, unknown>
@@ -72,7 +72,7 @@ export const make = <
       ...acc,
       [method]: makeRpc(transport, codec, method),
     }),
-    {} as any,
+    { _codecs: codecs } as any,
   )
 
 const makeRpc = <C extends RpcCodec<any>, TR, TE>(
