@@ -6,52 +6,55 @@ import * as Runtime from "@effect/io/Runtime"
 import * as Schedule from "@effect/io/Schedule"
 import { pipe } from "@fp-ts/data/Function"
 import * as O from "@fp-ts/data/Option"
-import {
-  Context,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react"
+import * as Either from "@fp-ts/data/Either"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
-export type EffectResult<A> =
+export type EffectResult<E, A> =
   | { _tag: "Initial" }
   | { _tag: "Loading" }
-  | { _tag: "HasResult"; value: A }
-  | { _tag: "LoadingWithResult"; value: A }
+  | { _tag: "HasResult"; value: Either.Either<E, A> }
+  | { _tag: "LoadingWithResult"; value: Either.Either<E, A> }
 
-const flatten = <A>(
-  result: EffectResult<A>,
+const flatten = <E, A>(
+  result: EffectResult<E, A>,
 ): Readonly<{
   isLoading: boolean
   value: O.Option<A>
+  error: O.Option<E>
 }> => ({
   isLoading: result._tag === "Loading" || result._tag == "LoadingWithResult",
   value:
-    result._tag === "HasResult" || result._tag === "LoadingWithResult"
-      ? O.some(result.value)
+    (result._tag === "HasResult" || result._tag === "LoadingWithResult") &&
+    result.value._tag === "Right"
+      ? O.some(result.value.right)
+      : O.none,
+  error:
+    (result._tag === "HasResult" || result._tag === "LoadingWithResult") &&
+    result.value._tag === "Left"
+      ? O.some(result.value.left)
       : O.none,
 })
 
 export interface UseEffectOpts<R> {
-  runtime: Context<Runtime.Runtime<R>>
+  runtime?: Runtime.Runtime<R>
   deps?: any[]
 }
 
-export const useEffectWithResult = <R, A>(
-  f: () => Effect.Effect<R, never, A>,
-  { runtime, deps = [] }: UseEffectOpts<R>,
+export const useEffectWithResult = <R, E, A>(
+  f: () => Effect.Effect<R, E, A>,
+  {
+    runtime = Runtime.defaultRuntime as Runtime.Runtime<R>,
+    deps = [],
+  }: UseEffectOpts<R> = {},
 ) => {
-  const rt = useContext(runtime)
   const effect = useMemo(f, deps)
-  const [cancel, setCancel] = useState(() => () => {})
-  const [result, setResult] = useState<EffectResult<A>>({ _tag: "Initial" })
+  const cancelRef = useRef<(() => void) | undefined>(undefined)
+  const [result, setResult] = useState<EffectResult<E, A>>({ _tag: "Initial" })
 
-  useEffect(() => cancel, [cancel])
+  useEffect(() => cancelRef.current?.(), [cancelRef])
 
   const run = useCallback(() => {
-    if (result._tag === "Loading" || result._tag === "LoadingWithResult") {
+    if (cancelRef.current) {
       return
     }
 
@@ -61,7 +64,9 @@ export const useEffectWithResult = <R, A>(
         : { _tag: "Loading" },
     )
 
-    const interrupt = rt.unsafeRunWith(effect, (exit) => {
+    const interrupt = runtime.unsafeRunWith(Effect.either(effect), (exit) => {
+      cancelRef.current = undefined
+
       if (Exit.isSuccess(exit)) {
         setResult({ _tag: "HasResult", value: exit.value })
       } else {
@@ -69,15 +74,15 @@ export const useEffectWithResult = <R, A>(
       }
     })
 
-    setCancel(() => interrupt(FiberId.none)(() => {}))
-  }, [rt, effect])
+    cancelRef.current = () => interrupt(FiberId.none)(() => {})
+  }, [runtime, effect, result])
 
   return { result, run }
 }
 
-export const useEffectIo = <R, A>(
-  f: () => Effect.Effect<R, never, A>,
-  opts: UseEffectOpts<R>,
+export const useEffectIo = <R, E, A>(
+  f: () => Effect.Effect<R, E, A>,
+  opts: UseEffectOpts<R> = {},
 ) => {
   const { result, run } = useEffectWithResult(f, opts)
   return { ...flatten(result), run }
@@ -86,26 +91,25 @@ export const useEffectIo = <R, A>(
 export const useEffectRepeat = <R, E, A>(
   f: () => Effect.Effect<R, E, A>,
   {
-    runtime,
+    runtime = Runtime.defaultRuntime as Runtime.Runtime<R>,
     schedule = Schedule.forever(),
     deps = [],
   }: UseEffectOpts<R> & {
     schedule?: Schedule.Schedule<never, A, unknown>
   },
 ) => {
-  const rt = useContext(runtime)
   const effect = useMemo(f, deps)
-  const [result, setResult] = useState<EffectResult<A>>({ _tag: "Loading" })
+  const [result, setResult] = useState<EffectResult<E, A>>({ _tag: "Loading" })
 
   useEffect(() => {
-    const interrupt = rt.unsafeRunWith(
+    const interrupt = runtime.unsafeRunWith(
       pipe(
         effect,
         Effect.tap((value) =>
           Effect.sync(() => {
             setResult({
               _tag: "LoadingWithResult",
-              value,
+              value: Either.right(value),
             })
           }),
         ),
@@ -115,7 +119,7 @@ export const useEffectRepeat = <R, E, A>(
     )
 
     return () => interrupt(FiberId.none)(() => {})
-  }, [effect, rt])
+  }, [effect, runtime])
 
   return flatten(result)
 }

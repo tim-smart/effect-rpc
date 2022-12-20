@@ -3,7 +3,6 @@ import * as Runtime from "@effect/io/Runtime"
 import * as E from "@fp-ts/data/Either"
 import { pipe } from "@fp-ts/data/Function"
 import React, {
-  Context,
   createContext,
   PropsWithChildren,
   useContext,
@@ -12,9 +11,7 @@ import React, {
 
 type CacheEntry<E, A> = E.Either<Promise<void>, E.Either<E, A>>
 
-const CacheContext = createContext<Map<string, CacheEntry<any, any>>>(
-  null as any,
-)
+const CacheContext = createContext<Map<string, CacheEntry<any, any>>>(new Map())
 
 export const EffectSuspenseProvider = ({ children }: PropsWithChildren) => {
   return (
@@ -24,20 +21,23 @@ export const EffectSuspenseProvider = ({ children }: PropsWithChildren) => {
 
 export interface EffectSuspenseOpts<R> {
   key: string
-  runtime: Context<Runtime.Runtime<R>>
+  runtime?: Runtime.Runtime<R>
   deps?: any[]
 }
 
 export const useEffectSuspense = <R, E, A>(
   f: () => Effect.Effect<R, E, A>,
-  { key, runtime, deps = [] }: EffectSuspenseOpts<R>,
+  {
+    key,
+    runtime = Runtime.defaultRuntime as Runtime.Runtime<R>,
+    deps = [],
+  }: EffectSuspenseOpts<R>,
 ) => {
-  const rt = useContext(runtime)
   const cache = useContext(CacheContext)
   const effect = useMemo(() => pipe(f(), Effect.either), deps)
 
   const refresh = () => {
-    const promise = rt.unsafeRunPromise(effect).then((a) => {
+    const promise = runtime.unsafeRunPromise(effect).then((a) => {
       cache.set(key, E.right(a))
     })
     cache.set(key, E.left(promise))
