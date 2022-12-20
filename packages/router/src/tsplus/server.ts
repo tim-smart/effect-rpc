@@ -2,11 +2,6 @@ import * as S from "../server.js"
 
 export { makeHandler } from "../server.js"
 
-export interface RpcRouter<H extends S.RpcHandlers> extends S.RpcRouterBase {
-  readonly handlers: H
-  readonly codecs: RpcCodecsFromHandlers<H>
-}
-
 export type RpcCodecsFromHandlers<H extends S.RpcHandlers> = {
   [K in keyof H]: H[K] extends Effect<any, infer E, infer O>
     ? S.RpcHandlerCodecNoInput<E, O>
@@ -14,12 +9,16 @@ export type RpcCodecsFromHandlers<H extends S.RpcHandlers> = {
     ? S.RpcHandlerCodecWithInput<E, I, O>
     : never
 }
-export const makeRouter = <H extends S.RpcHandlers>(
+export const makeRouter = <
+  H extends S.RpcHandlers,
+  C extends RpcCodecsFromHandlers<H>,
+>(
   handlers: H,
-  codecs: RpcCodecsFromHandlers<H>,
-): RpcRouter<H> => ({
+  codecs: C,
+): S.RpcRouter<C, H> => ({
   handlers,
   codecs,
+  undecoded: S.makeUndecodedClient(codecs, handlers as any),
 })
 
 // === derive

@@ -79,11 +79,14 @@ export type RpcHandlersE<H extends RpcHandlers> =
 export interface RpcRouterBase {
   readonly handlers: RpcHandlers
   readonly codecs: RpcHandlerCodecs
+  readonly undecoded: RpcUndecodedClient<RpcHandlers>
 }
 
-export interface RpcRouter<C extends RpcHandlerCodecs> extends RpcRouterBase {
+export interface RpcRouter<C extends RpcHandlerCodecs, H extends RpcHandlers>
+  extends RpcRouterBase {
+  readonly handlers: H
   readonly codecs: C
-  readonly handlers: RpcHandlersFromCodecs<C>
+  readonly undecoded: RpcUndecodedClient<H>
 }
 
 const requestDecoder = Derive<Decoder<RpcRequest>>()
@@ -94,12 +97,16 @@ export type RpcServer<H extends RpcHandlers> = (
   u: unknown,
 ) => Effect<RpcHandlersDeps<H>, never, unknown>
 
-export const makeRouter = <C extends RpcHandlerCodecs>(
+export const makeRouter = <
+  C extends RpcHandlerCodecs,
+  H extends RpcHandlersFromCodecs<C>,
+>(
   codecs: C,
-  handlers: RpcHandlersFromCodecs<C>,
-): RpcRouter<C> => ({
+  handlers: H,
+): RpcRouter<C, H> => ({
   codecs,
   handlers,
+  undecoded: makeUndecodedClient(codecs, handlers),
 })
 
 export const makeHandler =
@@ -153,7 +160,7 @@ export interface UndecodedRpcResponse<M> {
   __rpc: M
 }
 
-export type RpcServerClient<H extends RpcHandlers> = {
+export type RpcUndecodedClient<H extends RpcHandlers> = {
   [K in keyof H]: H[K] extends RpcDefinitionIO<infer R, infer E, infer I, any>
     ? (input: I) => Effect<R, E, UndecodedRpcResponse<K>>
     : H[K] extends Effect<infer R, infer E, any>
@@ -161,10 +168,16 @@ export type RpcServerClient<H extends RpcHandlers> = {
     : never
 }
 
-export const makeServerClient = <R extends RpcRouterBase>(router: R) =>
-  Object.entries(router.handlers).reduce<RpcServerClient<R["handlers"]>>(
+export const makeUndecodedClient = <
+  C extends RpcHandlerCodecs,
+  H extends RpcHandlersFromCodecs<C>,
+>(
+  codecs: C,
+  handlers: H,
+) =>
+  Object.entries(handlers).reduce<RpcUndecodedClient<H>>(
     (acc, [method, definition]) => {
-      const codec = router.codecs[method]
+      const codec = codecs[method]
       return {
         ...acc,
         [method]: Effect.isEffect(definition)

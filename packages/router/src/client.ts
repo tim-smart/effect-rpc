@@ -52,7 +52,7 @@ export type RpcClient<S extends RpcCodecs, TR, TE> = {
   _codecs: S
   _unsafeDecode: <M extends keyof S>(
     method: M,
-    output: unknown,
+    output: UndecodedRpcResponse<M>,
   ) => S[M] extends { output: Decoder<infer O> } ? O : never
 }
 
