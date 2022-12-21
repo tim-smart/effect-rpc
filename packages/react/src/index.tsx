@@ -14,6 +14,7 @@ import {
   EffectSuspenseProvider,
 } from "./useEffectSuspense.js"
 import React, { createContext, PropsWithChildren } from "react"
+import { useSubscriptionRef } from "./SubscriptionRef.js"
 
 export const makeHooks = <R,>(layer: Layer.Layer<never, never, R>) => {
   const scope = Effect.unsafeRunSync(Scope.make())
@@ -43,6 +44,7 @@ const makeFromRuntime = <R,>(
     useEffectWithResult: makeUseEffectWithResult(RuntimeContext),
     useEffectSuspense: makeUseEffectSuspense(RuntimeContext),
     useInvalidateEffect,
+    useSubscriptionRef,
   }
 }
 
