@@ -16,7 +16,7 @@ import {
 import React, { createContext, PropsWithChildren } from "react"
 import { useSubscriptionRef } from "./SubscriptionRef.js"
 
-export const makeHooks = <R,>(layer: Layer.Layer<never, never, R>) => {
+export const makeFromLayer = <R,>(layer: Layer.Layer<never, never, R>) => {
   const scope = Effect.unsafeRunSync(Scope.make())
   const runtime = pipe(layer, Layer.toRuntime)
   const scopedRuntime = Scope.use(runtime)(scope)
@@ -24,7 +24,7 @@ export const makeHooks = <R,>(layer: Layer.Layer<never, never, R>) => {
   return makeFromRuntime(scopedRuntime)
 }
 
-const makeFromRuntime = <R,>(
+export const makeFromRuntime = <R,>(
   runtime: Effect.Effect<never, never, Runtime.Runtime<R>>,
 ) => {
   const RuntimeContext = createContext(runtime)
@@ -48,5 +48,5 @@ const makeFromRuntime = <R,>(
   }
 }
 
-export const makeHooksDefault = () =>
+export const makeDefault = () =>
   makeFromRuntime(Effect.succeed(Runtime.defaultRuntime))
