@@ -8,7 +8,7 @@ import * as Scope from "@effect/io/Scope"
 import { pipe } from "@fp-ts/data/Function"
 import { useEffect, useMemo, useState } from "react"
 
-export interface SubscriptionRef<A> {
+export interface HubRef<A> {
   get: Effect.Effect<never, never, A>
   set: (a: A) => Effect.Effect<never, never, void>
   update: (f: (a: A) => A) => Effect.Effect<never, never, void>
@@ -17,7 +17,7 @@ export interface SubscriptionRef<A> {
 
 export const make = <A>(
   initialValue: A,
-): Effect.Effect<never, never, SubscriptionRef<A>> =>
+): Effect.Effect<never, never, HubRef<A>> =>
   pipe(
     Effect.struct({
       ref: Ref.make(initialValue),
@@ -49,7 +49,7 @@ export const make = <A>(
     }),
   )
 
-export const useSubscriptionRef = <A>(ref: SubscriptionRef<A>) => {
+export const useHubRef = <A>(ref: HubRef<A>) => {
   // Current value
   const [value, setValue] = useState(() => Effect.unsafeRunSync(ref.get))
 
