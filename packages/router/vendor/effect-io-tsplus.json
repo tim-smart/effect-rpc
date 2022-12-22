@@ -9827,6 +9827,17 @@
       ]
     },
     {
+      "definitionName": "flipCauseOption",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "getter",
+          "typeName": "effect/io/Cause",
+          "name": "flipCauseOption"
+        }
+      ]
+    },
+    {
       "definitionName": "dieOption",
       "definitionKind": "const",
       "extensions": [
@@ -10076,6 +10087,17 @@
           "kind": "static",
           "typeName": "effect/io/Effect.Ops",
           "name": "asyncOption"
+        }
+      ]
+    },
+    {
+      "definitionName": "asyncInterruptEither",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Effect.Ops",
+          "name": "asyncInterruptEither"
         }
       ]
     },
@@ -10652,13 +10674,13 @@
       ]
     },
     {
-      "definitionName": "promiseAbort",
+      "definitionName": "promiseInterrupt",
       "definitionKind": "const",
       "extensions": [
         {
           "kind": "static",
           "typeName": "effect/io/Effect.Ops",
-          "name": "promiseAbort"
+          "name": "promiseInterrupt"
         }
       ]
     },
@@ -10938,13 +10960,13 @@
       ]
     },
     {
-      "definitionName": "tryCatchPromiseAbort",
+      "definitionName": "tryCatchPromiseInterrupt",
       "definitionKind": "const",
       "extensions": [
         {
           "kind": "static",
           "typeName": "effect/io/Effect.Ops",
-          "name": "tryCatchPromiseAbort"
+          "name": "tryCatchPromiseInterrupt"
         }
       ]
     },
@@ -10960,13 +10982,13 @@
       ]
     },
     {
-      "definitionName": "tryPromiseAbort",
+      "definitionName": "tryPromiseInterrupt",
       "definitionKind": "const",
       "extensions": [
         {
           "kind": "static",
           "typeName": "effect/io/Effect.Ops",
-          "name": "tryPromiseAbort"
+          "name": "tryPromiseInterrupt"
         }
       ]
     },
@@ -12223,17 +12245,6 @@
           "kind": "pipeable",
           "typeName": "effect/io/Effect",
           "name": "race"
-        }
-      ]
-    },
-    {
-      "definitionName": "raceAll",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "pipeable",
-          "typeName": "effect/io/Effect",
-          "name": "raceAll"
         }
       ]
     },
@@ -14130,6 +14141,22 @@
           "kind": "getter",
           "typeName": "effect/io/FiberRefs/Patch",
           "name": "patchFiberRefs"
+        }
+      ]
+    },
+    {
+      "definitionName": "raceAll",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "getter",
+          "typeName": "Iterable",
+          "name": "raceAll"
+        },
+        {
+          "kind": "static",
+          "typeName": "effect/io/Effect.Ops",
+          "name": "raceAll"
         }
       ]
     },
