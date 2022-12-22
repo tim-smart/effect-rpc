@@ -146,10 +146,9 @@ export const makeUseHubRef =
         get,
         Effect.flatMap(() => subscribe),
       )
-
       return runner(effect, (exit) => {
-        if (Exit.isFailure(exit)) {
-          throw Cause.squash(exit.cause)
+        if (Exit.isFailure(exit) && !Exit.isInterrupted(exit)) {
+          console.error("useHubRef", Cause.pretty()(exit.cause))
         }
       })
     }, [runner])

@@ -63,8 +63,8 @@ export const makeUseEffectWithResult =
 
         if (Exit.isSuccess(exit)) {
           setResult({ _tag: "HasResult", value: exit.value })
-        } else {
-          throw Cause.squash(exit.cause)
+        } else if (!Exit.isInterrupted(exit)) {
+          console.error("useEffectWithResult", Cause.pretty()(exit.cause))
         }
       })
 
@@ -124,8 +124,8 @@ export const makeUseEffectRepeat =
           ),
         ),
         (exit) => {
-          if (Exit.isFailure(exit)) {
-            throw Cause.squash(exit.cause)
+          if (Exit.isFailure(exit) && !Exit.isInterrupted(exit)) {
+            console.error("useEffectRepeat", Cause.pretty()(exit.cause))
           }
         },
       )
