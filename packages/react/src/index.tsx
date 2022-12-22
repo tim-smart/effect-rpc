@@ -1,20 +1,20 @@
 import * as Effect from "@effect/io/Effect"
-import * as Scope from "@effect/io/Scope"
 import * as Layer from "@effect/io/Layer"
 import * as Runtime from "@effect/io/Runtime"
+import * as Scope from "@effect/io/Scope"
 import { pipe } from "@fp-ts/data/Function"
+import React, { createContext, PropsWithChildren } from "react"
+import { makeUseHubRef } from "./HubRef.js"
 import {
-  makeUseEffectWithResult,
   makeUseEffectIo,
   makeUseEffectRepeat,
+  makeUseEffectWithResult,
 } from "./useEffect.js"
 import {
+  EffectSuspenseProvider,
   makeUseEffectSuspense,
   useInvalidateEffect,
-  EffectSuspenseProvider,
 } from "./useEffectSuspense.js"
-import React, { createContext, PropsWithChildren } from "react"
-import { useHubRef } from "./HubRef.js"
 
 export * as HubRef from "./HubRef.js"
 
@@ -46,7 +46,7 @@ export const makeFromRuntime = <R,>(
     useEffectWithResult: makeUseEffectWithResult(RuntimeContext),
     useEffectSuspense: makeUseEffectSuspense(RuntimeContext),
     useInvalidateEffect,
-    useHubRef,
+    useHubRef: makeUseHubRef(RuntimeContext),
   }
 }
 

@@ -20,7 +20,7 @@ export interface EffectResultHelper<E, A> {
   readonly error: O.Option<E>
 }
 
-const flatten = <E, A>(
+export const flattenResult = <E, A>(
   result: EffectResult<E, A>,
 ): EffectResultHelper<E, A> => ({
   isLoading: result._tag === "Loading" || result._tag == "LoadingWithResult",
@@ -82,7 +82,7 @@ export const makeUseEffectIo = <R>(runtime: RuntimeContext<R>) => {
   const useEffectWithResult = makeUseEffectWithResult(runtime)
   return <E, A>(effect: Effect.Effect<R, E, A>): EffectHelperWithRun<E, A> => {
     const { result, run } = useEffectWithResult(effect)
-    return { ...flatten(result), run }
+    return { ...flattenResult(result), run }
   }
 }
 
@@ -121,5 +121,5 @@ export const makeUseEffectRepeat =
       return interrupt
     }, [effect, runner])
 
-    return flatten(result)
+    return flattenResult(result)
   }

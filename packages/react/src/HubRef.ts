@@ -1,11 +1,12 @@
 import * as Effect from "@effect/io/Effect"
-import * as Exit from "@effect/io/Exit"
-import * as FiberId from "@effect/io/Fiber/Id"
 import * as Hub from "@effect/io/Hub"
 import * as Ref from "@effect/io/Ref"
 import * as Scope from "@effect/io/Scope"
+import * as Either from "@fp-ts/data/Either"
 import { pipe } from "@fp-ts/data/Function"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
+import { RuntimeContext, useEffectRunner } from "./runtime.js"
+import { EffectResult, flattenResult } from "./useEffect.js"
 
 /**
  * @tsplus type effect-rpc/react/HubRef.ReadOnly
@@ -90,40 +91,39 @@ export const map = <A, B>(f: (a: A) => B) =>
 /**
  * @tsplus getter effect-rpc/react/HubRef use
  */
-export const useHubRef = <A>(ref: ReadOnlyHubRef<never, never, A>) => {
-  // Current value
-  const [value, setValue] = useState(() => Effect.unsafeRunSync(ref.get))
+export const makeUseHubRef =
+  <R>(runtimeContext: RuntimeContext<R>) =>
+  <E, A>(ref: ReadOnlyHubRef<R, E, A>) => {
+    const runner = useEffectRunner(runtimeContext)
 
-  // Scope
-  const scope = useMemo(() => Effect.unsafeRunSync(Scope.make()), [])
-  useEffect(
-    () => () => {
-      Effect.unsafeRunAsync(Scope.close(Exit.unit())(scope))
-    },
-    [scope],
-  )
+    // Current value
+    const [value, setValue] = useState<EffectResult<E, A>>({ _tag: "Initial" })
 
-  // Run
-  useEffect(() => {
-    const effect = pipe(
-      Scope.use(ref.subscribe)(scope),
-      Effect.flatMap((take) =>
-        pipe(
-          take,
-          Effect.tap((a) =>
-            Effect.sync(() => {
-              setValue(a)
-            }),
+    // Run
+    useEffect(() => {
+      const effect = pipe(
+        ref.subscribe,
+        Effect.flatMap((take) =>
+          pipe(
+            take,
+            Effect.tap((a) =>
+              Effect.sync(() => {
+                setValue({ _tag: "LoadingWithResult", value: Either.right(a) })
+              }),
+            ),
+            Effect.catchAll((e) =>
+              Effect.sync(() => {
+                setValue({ _tag: "LoadingWithResult", value: Either.left(e) })
+              }),
+            ),
+            Effect.forever,
           ),
-          Effect.forever,
         ),
-      ),
-    )
+        Effect.scoped,
+      )
 
-    const interrupt = Effect.unsafeRunWith(effect, () => {})
+      return runner(effect, () => {})
+    }, [runner])
 
-    return () => interrupt(FiberId.none)(() => {})
-  }, [scope])
-
-  return value
-}
+    return flattenResult(value)
+  }
