@@ -37,15 +37,15 @@ export const flattenResult = <E, A>(
 })
 
 export const makeUseEffectWithResult =
-  <R>(runtimeContext: RuntimeContext<R>) =>
+  <R, EC>(ctxContext: RuntimeContext<R, EC>) =>
   <E, A>(effect: Effect.Effect<R, E, A>) => {
-    const runner = useEffectRunner(runtimeContext)
+    const runner = useEffectRunner(ctxContext)
     const cancelRef = useRef<(() => void) | undefined>(undefined)
     const [result, setResult] = useState<EffectResult<E, A>>({
       _tag: "Initial",
     })
 
-    useEffect(() => cancelRef.current?.(), [cancelRef])
+    useEffect(() => () => cancelRef.current?.(), [cancelRef])
 
     const run = useCallback(() => {
       if (cancelRef.current) {
@@ -78,8 +78,8 @@ export interface EffectHelperWithRun<E, A> extends EffectResultHelper<E, A> {
   run: () => void
 }
 
-export const makeUseEffectIo = <R>(runtime: RuntimeContext<R>) => {
-  const useEffectWithResult = makeUseEffectWithResult(runtime)
+export const makeUseEffectIo = <R, EC>(ctx: RuntimeContext<R, EC>) => {
+  const useEffectWithResult = makeUseEffectWithResult(ctx)
   return <E, A>(effect: Effect.Effect<R, E, A>): EffectHelperWithRun<E, A> => {
     const { result, run } = useEffectWithResult(effect)
     return { ...flattenResult(result), run }
@@ -91,7 +91,7 @@ export interface UseEffectRepeatOpts<A> {
 }
 
 export const makeUseEffectRepeat =
-  <R>(runtimeContext: RuntimeContext<R>) =>
+  <R, EC>(runtimeContext: RuntimeContext<R, EC>) =>
   <E, A>(
     effect: Effect.Effect<R, E, A>,
     { schedule = Schedule.forever() }: UseEffectRepeatOpts<A> = {},
@@ -114,8 +114,20 @@ export const makeUseEffectRepeat =
             }),
           ),
           Effect.repeat(schedule),
+          Effect.catchAll((e) =>
+            Effect.sync(() => {
+              setResult({
+                _tag: "HasResult",
+                value: Either.left(e),
+              })
+            }),
+          ),
         ),
-        () => {},
+        (exit) => {
+          if (Exit.isFailure(exit)) {
+            throw Cause.squash(exit.cause)
+          }
+        },
       )
 
       return interrupt

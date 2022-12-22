@@ -1,4 +1,6 @@
+import * as Cause from "@effect/io/Cause"
 import * as Effect from "@effect/io/Effect"
+import * as Exit from "@effect/io/Exit"
 import * as Hub from "@effect/io/Hub"
 import * as Ref from "@effect/io/Ref"
 import * as Scope from "@effect/io/Scope"
@@ -92,17 +94,20 @@ export const map = <A, B>(f: (a: A) => B) =>
  * @tsplus getter effect-rpc/react/HubRef use
  */
 export const makeUseHubRef =
-  <R>(runtimeContext: RuntimeContext<R>) =>
-  <E, A>(ref: ReadOnlyHubRef<R, E, A>) => {
-    const runner = useEffectRunner(runtimeContext)
+  <R, EC>(ctxContext: RuntimeContext<R, EC>) =>
+  <E, E1, A>(ref: Effect.Effect<R, E1, ReadOnlyHubRef<R, E, A>>) => {
+    const runner = useEffectRunner(ctxContext)
 
     // Current value
-    const [value, setValue] = useState<EffectResult<E, A>>({ _tag: "Initial" })
+    const [value, setValue] = useState<EffectResult<E | E1, A>>({
+      _tag: "Initial",
+    })
 
     // Run
     useEffect(() => {
-      const getEffect = pipe(
-        ref.get,
+      const get = pipe(
+        ref,
+        Effect.flatMap((ref) => ref.get),
         Effect.flatMap((a) =>
           Effect.sync(() => {
             setValue({ _tag: "LoadingWithResult", value: Either.right(a) })
@@ -116,7 +121,8 @@ export const makeUseHubRef =
       )
 
       const subscribe = pipe(
-        ref.subscribe,
+        ref,
+        Effect.flatMap((ref) => ref.subscribe),
         Effect.flatMap((take) =>
           pipe(
             take,
@@ -137,11 +143,15 @@ export const makeUseHubRef =
       )
 
       const effect = pipe(
-        getEffect,
+        get,
         Effect.flatMap(() => subscribe),
       )
 
-      return runner(effect, () => {})
+      return runner(effect, (exit) => {
+        if (Exit.isFailure(exit)) {
+          throw Cause.squash(exit.cause)
+        }
+      })
     }, [runner])
 
     return flattenResult(value)

@@ -2,7 +2,6 @@ import * as Effect from "@effect/io/Effect"
 import * as Layer from "@effect/io/Layer"
 import * as Runtime from "@effect/io/Runtime"
 import * as Scope from "@effect/io/Scope"
-import { pipe } from "@fp-ts/data/Function"
 import React, { createContext, PropsWithChildren } from "react"
 import { makeUseHubRef } from "./HubRef.js"
 import {
@@ -14,25 +13,24 @@ import {
   EffectSuspenseProvider,
   makeUseEffectSuspense,
   useInvalidateEffect,
+  useInvalidateKey,
 } from "./useEffectSuspense.js"
 
 export * as HubRef from "./HubRef.js"
 
-export const makeFromLayer = <R,>(layer: Layer.Layer<never, never, R>) => {
+export const makeFromLayer = <R, E>(layer: Layer.Layer<never, E, R>) => {
   const scope = Effect.unsafeRunSync(Scope.make())
-  const runtime = pipe(layer, Layer.toRuntime)
-  const scopedRuntime = Scope.use(runtime)(scope)
-
-  return makeFromRuntime(scopedRuntime)
+  return makeFromRuntime(Scope.use(Layer.toRuntime(layer))(scope))
 }
 
-export const makeFromRuntime = <R,>(
-  runtime: Effect.Effect<never, never, Runtime.Runtime<R>>,
+export const makeFromRuntime = <R, E>(
+  makeContext: Effect.Effect<never, E, Runtime.Runtime<R>>,
 ) => {
-  const RuntimeContext = createContext(runtime)
+  const get = Effect.unsafeRunSync(Effect.memoize(makeContext))
+  const RuntimeContext = createContext(get)
 
   const Providers = ({ children }: PropsWithChildren) => (
-    <RuntimeContext.Provider value={runtime}>
+    <RuntimeContext.Provider value={get}>
       <EffectSuspenseProvider>{children}</EffectSuspenseProvider>
     </RuntimeContext.Provider>
   )
@@ -40,12 +38,13 @@ export const makeFromRuntime = <R,>(
   return {
     Providers,
     SuspenseProvider: EffectSuspenseProvider,
-    RuntimeContext,
+    EnvContext: RuntimeContext,
     useEffectIo: makeUseEffectIo(RuntimeContext),
     useEffectRepeat: makeUseEffectRepeat(RuntimeContext),
     useEffectWithResult: makeUseEffectWithResult(RuntimeContext),
     useEffectSuspense: makeUseEffectSuspense(RuntimeContext),
     useInvalidateEffect,
+    useInvalidateKey,
     useHubRef: makeUseHubRef(RuntimeContext),
   }
 }

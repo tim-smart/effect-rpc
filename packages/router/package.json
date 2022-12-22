@@ -1,6 +1,6 @@
 {
   "name": "@effect-rpc/router",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "type": "module",
   "description": "Simple RPC system for effect/io",
   "publishConfig": {
@@ -21,16 +21,16 @@
   "author": "Tim Smart <hello@timsmart.co>",
   "license": "MIT",
   "devDependencies": {
-    "@effect/io": "^0.0.39",
-    "@fp-ts/data": "^0.0.26",
+    "@effect/io": "^0.0.42",
+    "@fp-ts/data": "^0.0.29",
     "@tsplus/runtime": "^0.1.10",
     "@types/node": "^18.11.13",
     "prettier": "^2.8.1",
     "typescript": "https://cdn.jsdelivr.net/npm/@tsplus/installer/compiler/typescript.tgz"
   },
   "peerDependencies": {
-    "@effect/io": "^0.0.38",
-    "@fp-ts/data": "^0.0.26",
+    "@effect/io": "^0.0.42",
+    "@fp-ts/data": "^0.0.29",
     "@tsplus/runtime": "^0.1.10"
   },
   "dependencies": {

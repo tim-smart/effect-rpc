@@ -6,19 +6,19 @@ import * as Either from "@fp-ts/data/Either"
 import { pipe } from "@fp-ts/data/Function"
 import { Context, useCallback, useContext } from "react"
 
-export type RuntimeContext<R> = Context<
-  Effect.Effect<never, never, Runtime.Runtime<R>>
+export type RuntimeContext<R, E> = Context<
+  Effect.Effect<never, E, Runtime.Runtime<R>>
 >
 
-const useWrapEffect = <R>(context: RuntimeContext<R>) => {
+const useWrapEffect = <R, EC>(context: RuntimeContext<R, EC>) => {
   const runtime = useContext(context)
 
   return useCallback(
     <E, A>(effect: Effect.Effect<R, E, A>) =>
       pipe(
         runtime,
-        Effect.flatMap((rt) =>
-          Effect.asyncInterrupt<never, E, A>((resume) => {
+        Effect.flatMap((rt) => {
+          return Effect.asyncInterrupt<never, E, A>((resume) => {
             const interrupt = rt.unsafeRunWith(effect, (exit) => {
               if (Exit.isSuccess(exit)) {
                 resume(Effect.succeed(exit.value))
@@ -28,39 +28,35 @@ const useWrapEffect = <R>(context: RuntimeContext<R>) => {
             })
 
             return Either.left(
-              pipe(
-                Effect.fiberId(),
-                Effect.tap((id) =>
-                  Effect.sync(() => {
-                    interrupt(id)(() => {})
-                  }),
-                ),
-              ),
+              Effect.sync(() => {
+                interrupt(FiberId.none)(() => {})
+              }),
             )
-          }),
-        ),
+          })
+        }),
       ),
     [runtime],
   )
 }
 
-export const useEffectRunner = <R>(context: RuntimeContext<R>) => {
+export const useEffectRunner = <R, EC>(context: RuntimeContext<R, EC>) => {
   const wrap = useWrapEffect(context)
 
   return useCallback(
     <E, A>(
       effect: Effect.Effect<R, E, A>,
-      onExit: (exit: Exit.Exit<E, A>) => void,
+      onExit: (exit: Exit.Exit<E | EC, A>) => void,
     ) => {
-      const wrapped = wrap(effect)
-      const interrupt = Effect.unsafeRunWith(wrapped, onExit)
+      const interrupt = Effect.unsafeRunWith(wrap(effect), onExit)
       return () => interrupt(FiberId.none)(() => {})
     },
     [wrap],
   )
 }
 
-export const useEffectRunnerPromise = <R>(context: RuntimeContext<R>) => {
+export const useEffectRunnerPromise = <R, EC>(
+  context: RuntimeContext<R, EC>,
+) => {
   const wrap = useWrapEffect(context)
 
   return useCallback(
