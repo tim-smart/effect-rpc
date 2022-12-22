@@ -17,7 +17,7 @@ export const make = ({
   headers = {},
 }: FetchTransportOptions): RpcClientTransport<never, FetchError> => ({
   send: (u) =>
-    Effect.tryCatchPromiseAbort(
+    Effect.tryCatchPromiseInterrupt(
       (signal) =>
         fetch(url, {
           method,
