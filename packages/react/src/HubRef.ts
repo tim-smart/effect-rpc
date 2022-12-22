@@ -101,7 +101,21 @@ export const makeUseHubRef =
 
     // Run
     useEffect(() => {
-      const effect = pipe(
+      const getEffect = pipe(
+        ref.get,
+        Effect.flatMap((a) =>
+          Effect.sync(() => {
+            setValue({ _tag: "LoadingWithResult", value: Either.right(a) })
+          }),
+        ),
+        Effect.catchAll((e) =>
+          Effect.sync(() => {
+            setValue({ _tag: "LoadingWithResult", value: Either.left(e) })
+          }),
+        ),
+      )
+
+      const subscribe = pipe(
         ref.subscribe,
         Effect.flatMap((take) =>
           pipe(
@@ -120,6 +134,11 @@ export const makeUseHubRef =
           ),
         ),
         Effect.scoped,
+      )
+
+      const effect = pipe(
+        getEffect,
+        Effect.flatMap(() => subscribe),
       )
 
       return runner(effect, () => {})
