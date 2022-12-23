@@ -1,6 +1,6 @@
 {
   "name": "@effect-rpc/react",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -18,16 +18,16 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@effect/io": "^0.0.42",
-    "@fp-ts/data": "^0.0.30",
+    "@effect/io": "~0.0.42",
+    "@fp-ts/data": "~0.0.30",
     "@types/react": "^18.0.26",
     "prettier": "^2.8.1",
     "react": "^18.2.0",
     "typescript": "^4.9.4"
   },
   "peerDependencies": {
-    "@effect/io": "^0.0.42",
-    "@fp-ts/data": "^0.0.30",
+    "@effect/io": "~0.0.42",
+    "@fp-ts/data": "~0.0.30",
     "react": "^18.2.0"
   }
 }
