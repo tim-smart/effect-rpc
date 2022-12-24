@@ -1,6 +1,5 @@
 import * as Effect from "@effect/io/Effect"
 import * as E from "@fp-ts/data/Either"
-import * as Equal from "@fp-ts/data/Equal"
 import React, {
   createContext,
   PropsWithChildren,
@@ -10,30 +9,32 @@ import React, {
 import { RuntimeContext, useEffectRunnerPromise } from "./runtime.js"
 
 type CacheEntry<E, A> = E.Either<Promise<void>, E.Either<E, A>>
-type Cache = Map<number, CacheEntry<unknown, unknown>>
+type Cache = WeakMap<
+  Effect.Effect<unknown, unknown, unknown>,
+  CacheEntry<unknown, unknown>
+>
 
-const CacheContext = createContext<Cache>(new Map())
+const CacheContext = createContext<Cache>(new WeakMap())
 
 export const EffectSuspenseProvider = ({ children }: PropsWithChildren) => {
-  const value = useMemo<Cache>(() => new Map(), [])
+  const value = useMemo<Cache>(() => new WeakMap(), [])
   return <CacheContext.Provider value={value}>{children}</CacheContext.Provider>
 }
 
 export const makeUseEffectSuspense =
   <R, EC>(runtime: RuntimeContext<R, EC>) =>
-  <E, A>(effect: Effect.Effect<R, E, A>, key?: any) => {
+  <E, A>(effect: Effect.Effect<R, E, A>) => {
     const runner = useEffectRunnerPromise(runtime)
     const cache = useContext(CacheContext)
-    const cacheKey = useMemo(() => Equal.hash(key ?? effect), [effect, key])
 
-    const entry = cache.get(cacheKey) as CacheEntry<E, A>
+    const entry = cache.get(effect) as CacheEntry<E, A>
 
     if (!entry) {
       const promise = runner(Effect.either(effect)).then((a) => {
-        cache.set(cacheKey, E.right(a))
+        cache.set(effect, E.right(a))
       })
 
-      cache.set(cacheKey, E.left(promise))
+      cache.set(effect, E.left(promise))
 
       throw promise
     }
@@ -47,7 +48,11 @@ export const makeUseEffectSuspense =
     return entry.right.right
   }
 
-export const useInvalidateEffect = (effectOrKey: any) => {
+export const useInvalidateEffect = (
+  effect: Effect.Effect<unknown, unknown, unknown>,
+) => {
   const cache = useContext(CacheContext)
-  return () => cache.delete(Equal.hash(effectOrKey))
+  return () => cache.delete(effect)
 }
+
+useInvalidateEffect(Effect.succeed(1))

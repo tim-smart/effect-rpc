@@ -3,7 +3,6 @@ import * as Layer from "@effect/io/Layer"
 import * as Runtime from "@effect/io/Runtime"
 import * as Scope from "@effect/io/Scope"
 import React, { createContext, PropsWithChildren } from "react"
-import { makeUseHubRef } from "./HubRef.js"
 import {
   makeUseEffectIo,
   makeUseEffectRepeat,
@@ -13,10 +12,7 @@ import {
   EffectSuspenseProvider,
   makeUseEffectSuspense,
   useInvalidateEffect,
-  useInvalidateKey,
 } from "./useEffectSuspense.js"
-
-export * as HubRef from "./HubRef.js"
 
 export const makeFromLayer = <R, E>(layer: Layer.Layer<never, E, R>) => {
   const scope = Effect.unsafeRunSync(Scope.make())
@@ -44,8 +40,6 @@ export const makeFromRuntime = <R, E>(
     useEffectWithResult: makeUseEffectWithResult(RuntimeContext),
     useEffectSuspense: makeUseEffectSuspense(RuntimeContext),
     useInvalidateEffect,
-    useInvalidateKey,
-    useHubRef: makeUseHubRef(RuntimeContext),
   }
 }
 
