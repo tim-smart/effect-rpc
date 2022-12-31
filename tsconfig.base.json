@@ -12,8 +12,8 @@
     "paths": {
       "@effect-rpc/router": ["./packages/router/src/index.js"],
       "@effect-rpc/router/*": ["./packages/router/src/*.js"],
-      "@effect-rpc/tsplus": ["./packages/tsplus/src/index.js"],
-      "@effect-rpc/tsplus/*": ["./packages/tsplus/src/*.js"]
+      "@effect-rpc/react": ["./packages/react/src/index.js"],
+      "@effect-rpc/react/*": ["./packages/react/src/*.js"]
     },
     "composite": true
   },

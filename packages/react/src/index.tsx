@@ -6,6 +6,7 @@ import React, { createContext, PropsWithChildren } from "react"
 import {
   makeUseEffectIo,
   makeUseEffectRepeat,
+  makeUseEffectScoped,
   makeUseEffectWithResult,
 } from "./useEffect.js"
 import {
@@ -13,6 +14,8 @@ import {
   makeUseEffectSuspense,
   useInvalidateEffect,
 } from "./useEffectSuspense.js"
+import { useSubscriptionRef } from "./useSubscriptionRef.js"
+import { makeUseStreamSuspense } from "./useStreamSuspense.js"
 
 export const makeFromLayer = <R, E>(layer: Layer.Layer<never, E, R>) => {
   const scope = Effect.unsafeRunSync(Scope.make())
@@ -36,10 +39,13 @@ export const makeFromRuntime = <R, E>(
     SuspenseProvider: EffectSuspenseProvider,
     EnvContext: RuntimeContext,
     useEffectIo: makeUseEffectIo(RuntimeContext),
+    useEffectScoped: makeUseEffectScoped(RuntimeContext),
     useEffectRepeat: makeUseEffectRepeat(RuntimeContext),
     useEffectWithResult: makeUseEffectWithResult(RuntimeContext),
     useEffectSuspense: makeUseEffectSuspense(RuntimeContext),
     useInvalidateEffect,
+    useSubscriptionRef,
+    useStreamSuspense: makeUseStreamSuspense(RuntimeContext),
   }
 }
 

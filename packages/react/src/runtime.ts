@@ -2,7 +2,6 @@ import * as Effect from "@effect/io/Effect"
 import * as Exit from "@effect/io/Exit"
 import * as FiberId from "@effect/io/Fiber/Id"
 import * as Runtime from "@effect/io/Runtime"
-import { pipe } from "@fp-ts/data/Function"
 import { Context, useCallback, useContext } from "react"
 
 export type RuntimeContext<R, E> = Context<
@@ -14,23 +13,20 @@ const useWrapEffect = <R, EC>(context: RuntimeContext<R, EC>) => {
 
   return useCallback(
     <E, A>(effect: Effect.Effect<R, E, A>) =>
-      pipe(
-        runtime,
-        Effect.flatMap((rt) =>
-          Effect.asyncInterrupt<never, E, A>((resume) => {
-            const interrupt = rt.unsafeRunWith(effect, (exit) => {
-              if (Exit.isSuccess(exit)) {
-                resume(Effect.succeed(exit.value))
-              } else {
-                resume(Effect.failCause(exit.cause))
-              }
-            })
+      runtime.flatMap((rt) =>
+        Effect.asyncInterrupt<never, E, A>((resume) => {
+          const interrupt = rt.unsafeRunWith(effect, (exit) => {
+            if (Exit.isSuccess(exit)) {
+              resume(Effect.succeed(exit.value))
+            } else {
+              resume(Effect.failCause(exit.cause))
+            }
+          })
 
-            return Effect.sync(() => {
-              interrupt(FiberId.none)(() => {})
-            })
-          }),
-        ),
+          return Effect.sync(() => {
+            interrupt(FiberId.none)(() => {})
+          })
+        }),
       ),
     [runtime],
   )

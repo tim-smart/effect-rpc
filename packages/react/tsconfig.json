@@ -5,7 +5,12 @@
     "outDir": "dist",
     "rootDir": "src",
     "tsBuildInfoFile": ".tsbuildinfo",
-    "jsx": "react"
+    "jsx": "react",
+    "tsPlusTypes": [
+      "./vendor/effect-io-tsplus.json",
+      "./vendor/effect-stream-tsplus.json",
+      "./vendor/fp-ts-data-tsplus.json"
+    ]
   },
 
   "include": ["src/**/*.ts", "src/**/*.tsx"]

@@ -1,23 +1,16 @@
-import * as Cause from "@effect/io/Cause"
-import * as Effect from "@effect/io/Effect"
-import * as Exit from "@effect/io/Exit"
-import * as Schedule from "@effect/io/Schedule"
-import * as Either from "@fp-ts/data/Either"
-import { pipe } from "@fp-ts/data/Function"
-import * as O from "@fp-ts/data/Option"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { RuntimeContext, useEffectRunner } from "./runtime.js"
 
 export type EffectResult<E, A> =
   | { _tag: "Initial" }
   | { _tag: "Loading" }
-  | { _tag: "HasResult"; value: Either.Either<E, A> }
-  | { _tag: "LoadingWithResult"; value: Either.Either<E, A> }
+  | { _tag: "HasResult"; value: Either<E, A> }
+  | { _tag: "LoadingWithResult"; value: Either<E, A> }
 
 export interface EffectResultHelper<E, A> {
   readonly isLoading: boolean
-  readonly value: O.Option<A>
-  readonly error: O.Option<E>
+  readonly value: Maybe<A>
+  readonly error: Maybe<E>
 }
 
 export const flattenResult = <E, A>(
@@ -27,18 +20,18 @@ export const flattenResult = <E, A>(
   value:
     (result._tag === "HasResult" || result._tag === "LoadingWithResult") &&
     result.value._tag === "Right"
-      ? O.some(result.value.right)
-      : O.none,
+      ? Maybe.some(result.value.right)
+      : Maybe.none,
   error:
     (result._tag === "HasResult" || result._tag === "LoadingWithResult") &&
     result.value._tag === "Left"
-      ? O.some(result.value.left)
-      : O.none,
+      ? Maybe.some(result.value.left)
+      : Maybe.none,
 })
 
 export const makeUseEffectWithResult =
   <R, EC>(ctxContext: RuntimeContext<R, EC>) =>
-  <E, A>(effect: Effect.Effect<R, E, A>) => {
+  <E, A>(effect: Effect<R, E, A>) => {
     const runner = useEffectRunner(ctxContext)
     const cancelRef = useRef<(() => void) | undefined>(undefined)
     const [result, setResult] = useState<EffectResult<E, A>>({
@@ -58,13 +51,13 @@ export const makeUseEffectWithResult =
           : { _tag: "Loading" },
       )
 
-      const cancel = runner(Effect.either(effect), (exit) => {
+      const cancel = runner(effect.either, (exit) => {
         cancelRef.current = undefined
 
-        if (Exit.isSuccess(exit)) {
+        if (exit.isSuccess()) {
           setResult({ _tag: "HasResult", value: exit.value })
-        } else if (!Exit.isInterrupted(exit)) {
-          console.error("useEffectWithResult", Cause.pretty()(exit.cause))
+        } else if (!exit.isInterrupted()) {
+          console.error("useEffectWithResult", exit.cause.pretty())
         }
       })
 
@@ -80,20 +73,32 @@ export interface EffectHelperWithRun<E, A> extends EffectResultHelper<E, A> {
 
 export const makeUseEffectIo = <R, EC>(ctx: RuntimeContext<R, EC>) => {
   const useEffectWithResult = makeUseEffectWithResult(ctx)
-  return <E, A>(effect: Effect.Effect<R, E, A>): EffectHelperWithRun<E, A> => {
+  return <E, A>(effect: Effect<R, E, A>): EffectHelperWithRun<E, A> => {
     const { result, run } = useEffectWithResult(effect)
     return { ...flattenResult(result), run }
   }
 }
 
+export const makeUseEffectScoped = <R, EC>(ctx: RuntimeContext<R, EC>) => {
+  const useEffectWithResult = makeUseEffectWithResult(ctx)
+  return <E, A>(effect: Effect<R | Scope, E, A>): EffectHelperWithRun<E, A> => {
+    const scope = useMemo(() => Scope.make().unsafeRunSync, [])
+    useEffect(() => () => scope.close(Exit.unit()).unsafeRunAsync, [scope])
+
+    const scopedEffect = useMemo(() => scope.use(effect), [effect, scope])
+    const { result, run } = useEffectWithResult(scopedEffect)
+    return { ...flattenResult(result), run }
+  }
+}
+
 export interface UseEffectRepeatOpts<A> {
-  schedule?: Schedule.Schedule<never, A, unknown>
+  schedule?: Schedule<never, A, unknown>
 }
 
 export const makeUseEffectRepeat =
   <R, EC>(runtimeContext: RuntimeContext<R, EC>) =>
   <E, A>(
-    effect: Effect.Effect<R, E, A>,
+    effect: Effect<R, E, A>,
     { schedule = Schedule.forever() }: UseEffectRepeatOpts<A> = {},
   ) => {
     const runner = useEffectRunner(runtimeContext)
@@ -103,18 +108,17 @@ export const makeUseEffectRepeat =
 
     useEffect(() => {
       const interrupt = runner(
-        pipe(
-          effect,
-          Effect.tap((value) =>
+        effect
+          .tap((value) =>
             Effect.sync(() => {
               setResult({
                 _tag: "LoadingWithResult",
                 value: Either.right(value),
               })
             }),
-          ),
-          Effect.repeat(schedule),
-          Effect.catchAll((e) =>
+          )
+          .repeat(schedule)
+          .catchAll((e) =>
             Effect.sync(() => {
               setResult({
                 _tag: "HasResult",
@@ -122,10 +126,9 @@ export const makeUseEffectRepeat =
               })
             }),
           ),
-        ),
         (exit) => {
-          if (Exit.isFailure(exit) && !Exit.isInterrupted(exit)) {
-            console.error("useEffectRepeat", Cause.pretty()(exit.cause))
+          if (exit.isFailure() && !exit.isInterrupted()) {
+            console.error("useEffectRepeat", exit.cause.pretty())
           }
         },
       )
