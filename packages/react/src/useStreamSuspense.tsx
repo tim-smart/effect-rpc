@@ -1,11 +1,3 @@
-import * as Effect from "@effect/io/Effect"
-import * as Exit from "@effect/io/Exit"
-import * as Scope from "@effect/io/Scope"
-import * as Stream from "@effect/stream/Stream"
-import * as SR from "@effect/stream/SubscriptionRef"
-import * as Chunk from "@fp-ts/data/Chunk"
-import * as E from "@fp-ts/data/Either"
-import * as These from "@fp-ts/data/These"
 import React, {
   PropsWithChildren,
   createContext,
@@ -16,11 +8,11 @@ import { RuntimeContext, useEffectRunnerPromise } from "./runtime.js"
 import { useSubscriptionRef } from "./useSubscriptionRef.js"
 
 export interface Cache {
-  registry: FinalizationRegistry<Scope.CloseableScope>
-  entries: WeakMap<Stream.Stream<any, any, any>, CacheEntry<any, any>>
+  registry: FinalizationRegistry<CloseableScope>
+  entries: WeakMap<Stream<any, any, any>, CacheEntry<any, any>>
 }
 
-export type CacheEntry<E, A> = E.Either<
+export type CacheEntry<E, A> = Either<
   Promise<void>,
   {
     pull: () => Promise<void>
@@ -28,10 +20,9 @@ export type CacheEntry<E, A> = E.Either<
   }
 >
 
-export type StreamRef<E, A> = SR.SubscriptionRef<{
+export type StreamRef<E, A> = SubscriptionRef<{
   readonly pulling: boolean
-  readonly complete: boolean
-  readonly value: These.These<E, A>
+  readonly value: These<Maybe<E>, A>
 }>
 
 export class EmptyStreamError {
@@ -40,7 +31,7 @@ export class EmptyStreamError {
 
 const makeCache = (): Cache => ({
   registry: new FinalizationRegistry((scope) => {
-    Effect.unsafeRunAsync(Scope.close(Exit.unit())(scope))
+    scope.close(Exit.unit()).unsafeRunAsync
   }),
   entries: new WeakMap(),
 })
@@ -55,10 +46,10 @@ export const StreamSuspenseProvider = ({ children }: PropsWithChildren) => {
   )
 }
 
-const streamToPull = <R, E, A>(stream: Stream.Stream<R, E, A>) =>
+const streamToPull = <R, E, A>(stream: Stream<R, E, A>) =>
   Do(($) => {
     const pullChunk = $(stream.rechunk(1).toPull)
-    const pull = pullChunk.map(Chunk.unsafeHead)
+    const pull = pullChunk.map((c) => c.unsafeHead)
     const first = $(
       pull
         .catchTag("None", () => Effect.fail(new EmptyStreamError()))
@@ -66,50 +57,49 @@ const streamToPull = <R, E, A>(stream: Stream.Stream<R, E, A>) =>
     )
 
     const ref: StreamRef<E, A> = $(
-      SR.make({
+      SubscriptionRef.make({
         pulling: false,
         complete: false,
         value: These.right(first),
       }),
     )
 
-    const pullAndUpdate = ref
-      .update((a) => ({
-        ...a,
-        pulling: true,
-      }))
-      .flatMap(() => pull)
-      .tap((a) =>
-        ref.update((current) => ({
+    const pullAndUpdate = Do(($) => {
+      const current = $(ref.get)
+      if (current.pulling) return
+
+      $(
+        ref.set({
           ...current,
+          pulling: true,
+        }),
+      )
+
+      const a = $(pull)
+
+      $(
+        ref.set({
           pulling: false,
           value: current.value.map(() => a),
-        })),
+        }),
       )
-      .catchTag("None", () =>
-        ref.update((current) => ({
-          ...current,
-          pulling: false,
-          complete: true,
-        })),
-      )
-      .catchAll((e) =>
-        ref.update((current) => ({
-          pulling: false,
-          complete: true,
-          value: current.value.match(
-            () => These.left(e.value),
-            (a) => These.both(e.value, a),
-            (_, a) => These.both(e.value, a),
-          ),
-        })),
-      ).asUnit
+    }).catchAll((e) =>
+      ref.update((current) => ({
+        pulling: false,
+        value: current.value.match(
+          () => These.left(e),
+          (a) => These.both(e, a),
+          (_, a) => These.both(e, a),
+        ),
+      })),
+    )
+
     return [ref, pullAndUpdate] as const
   })
 
 export const makeUseStreamSuspense =
   <R, EC>(runtime: RuntimeContext<R, EC>) =>
-  <E, A>(stream: Stream.Stream<R, E, A>) => {
+  <E, A>(stream: Stream<R, E, A>) => {
     const runner = useEffectRunnerPromise(runtime)
     const { entries, registry } = useContext(StreamSuspenseContext)
     const entry = entries.get(stream) as CacheEntry<E, A>
@@ -122,7 +112,7 @@ export const makeUseStreamSuspense =
         Effect.sync(() => {
           entries.set(
             stream,
-            E.right({
+            Either.right({
               pull: () => runner(pull),
               ref,
             }),
@@ -131,20 +121,20 @@ export const makeUseStreamSuspense =
       ).asUnit
 
       const promise = runner(scope.use(effect))
-      entries.set(stream, E.left(promise))
+      entries.set(stream, Either.left(promise))
       throw promise
     } else if (entry._tag === "Left") {
       throw entry.left
     }
 
-    const { pulling, complete, value } = useSubscriptionRef(entry.right.ref)
+    const { pulling, value } = useSubscriptionRef(entry.right.ref)
     const pull = entry.right.pull
 
     return {
       pull,
       pulling,
-      complete,
-      error: value.getLeft,
-      value: value.getRight,
+      complete: value.isBoth() && value.left._tag === "None",
+      error: value.getLeft.flatten,
+      value: value.getOrThrow(() => "left"),
     }
   }

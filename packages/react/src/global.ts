@@ -2,6 +2,8 @@
  * @tsplus global
  */
 import type {
+  Chunk,
+  CloseableScope,
   Effect,
   Either,
   Exit,

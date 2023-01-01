@@ -2,7 +2,7 @@ import * as Effect from "@effect/io/Effect"
 import * as Layer from "@effect/io/Layer"
 import * as Runtime from "@effect/io/Runtime"
 import * as Scope from "@effect/io/Scope"
-import React, { createContext, PropsWithChildren } from "react"
+import React, { PropsWithChildren, createContext } from "react"
 import {
   makeUseEffectIo,
   makeUseEffectRepeat,
@@ -14,8 +14,12 @@ import {
   makeUseEffectSuspense,
   useInvalidateEffect,
 } from "./useEffectSuspense.js"
+import {
+  StreamSuspenseProvider,
+  makeUseStreamSuspense,
+} from "./useStreamSuspense.js"
 import { useSubscriptionRef } from "./useSubscriptionRef.js"
-import { makeUseStreamSuspense } from "./useStreamSuspense.js"
+import { makeUseStream, makeUseStreamLatest } from "./useStream.js"
 
 export const makeFromLayer = <R, E>(layer: Layer.Layer<never, E, R>) => {
   const scope = Effect.unsafeRunSync(Scope.make())
@@ -30,7 +34,9 @@ export const makeFromRuntime = <R, E>(
 
   const Providers = ({ children }: PropsWithChildren) => (
     <RuntimeContext.Provider value={get}>
-      <EffectSuspenseProvider>{children}</EffectSuspenseProvider>
+      <EffectSuspenseProvider>
+        <StreamSuspenseProvider>{children}</StreamSuspenseProvider>
+      </EffectSuspenseProvider>
     </RuntimeContext.Provider>
   )
 
@@ -46,6 +52,8 @@ export const makeFromRuntime = <R, E>(
     useInvalidateEffect,
     useSubscriptionRef,
     useStreamSuspense: makeUseStreamSuspense(RuntimeContext),
+    useStream: makeUseStream(RuntimeContext),
+    useStreamLatest: makeUseStreamLatest(RuntimeContext),
   }
 }
 
