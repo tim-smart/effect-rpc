@@ -31,7 +31,12 @@ export const makeUseStream =
     const runner = useEffectRunner(runtime)
 
     const scope = useMemo(() => Scope.make().unsafeRunSync, [])
-    useEffect(() => () => scope.close(Exit.unit()).unsafeRunAsync, [scope])
+    useEffect(
+      () => () => {
+        scope.close(Exit.unit()).unsafeRun()
+      },
+      [scope],
+    )
 
     const [value, setValue] = useState<StreamResult<E, A>>({ _tag: "Initial" })
     const pullRef = useRef<Effect<R, Maybe<E>, A> | undefined>(undefined)

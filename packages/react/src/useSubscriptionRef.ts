@@ -1,4 +1,3 @@
-import * as FiberId from "@effect/io/Fiber/Id"
 import * as SR from "@effect/stream/SubscriptionRef"
 import { useEffect, useState } from "react"
 
@@ -12,13 +11,13 @@ export const useSubscriptionRef = <E, A>(ref: SR.SubscriptionRef<A>) => {
           setValue(a)
         }),
       )
-      .runDrain.unsafeRunWith((exit) => {
+      .runDrain.unsafeRun((exit) => {
         if (exit.isFailure() && !exit.isInterrupted()) {
           console.error("useSubscriptionRef", exit.cause.pretty())
         }
       })
 
-    return () => interrupt(FiberId.none)(() => {})
+    return () => interrupt()
   }, [ref])
 
   return value

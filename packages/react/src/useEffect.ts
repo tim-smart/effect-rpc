@@ -83,7 +83,12 @@ export const makeUseEffectScoped = <R, EC>(ctx: RuntimeContext<R, EC>) => {
   const useEffectWithResult = makeUseEffectWithResult(ctx)
   return <E, A>(effect: Effect<R | Scope, E, A>): EffectHelperWithRun<E, A> => {
     const scope = useMemo(() => Scope.make().unsafeRunSync, [])
-    useEffect(() => () => scope.close(Exit.unit()).unsafeRunAsync, [scope])
+    useEffect(
+      () => () => {
+        scope.close(Exit.unit()).unsafeRun()
+      },
+      [scope],
+    )
 
     const scopedEffect = useMemo(() => scope.use(effect), [effect, scope])
     const { result, run } = useEffectWithResult(scopedEffect)

@@ -1,6 +1,5 @@
 import * as Effect from "@effect/io/Effect"
 import * as Exit from "@effect/io/Exit"
-import * as FiberId from "@effect/io/Fiber/Id"
 import * as Runtime from "@effect/io/Runtime"
 import { Context, useCallback, useContext } from "react"
 
@@ -15,7 +14,7 @@ const useWrapEffect = <R, EC>(context: RuntimeContext<R, EC>) => {
     <E, A>(effect: Effect.Effect<R, E, A>) =>
       runtime.flatMap((rt) =>
         Effect.asyncInterrupt<never, E, A>((resume) => {
-          const interrupt = rt.unsafeRunWith(effect, (exit) => {
+          const interrupt = rt.unsafeRun(effect, (exit) => {
             if (Exit.isSuccess(exit)) {
               resume(Effect.succeed(exit.value))
             } else {
@@ -24,7 +23,7 @@ const useWrapEffect = <R, EC>(context: RuntimeContext<R, EC>) => {
           })
 
           return Effect.sync(() => {
-            interrupt(FiberId.none)(() => {})
+            interrupt()
           })
         }),
       ),
@@ -40,8 +39,8 @@ export const useEffectRunner = <R, EC>(context: RuntimeContext<R, EC>) => {
       effect: Effect.Effect<R, E, A>,
       onExit: (exit: Exit.Exit<E | EC, A>) => void,
     ) => {
-      const interrupt = Effect.unsafeRunWith(wrap(effect), onExit)
-      return () => interrupt(FiberId.none)(() => {})
+      const interrupt = Effect.unsafeRun(wrap(effect), onExit)
+      return () => interrupt()
     },
     [wrap],
   )

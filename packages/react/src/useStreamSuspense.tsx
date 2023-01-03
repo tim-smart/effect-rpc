@@ -31,7 +31,7 @@ export class EmptyStreamError {
 
 const makeCache = (): Cache => ({
   registry: new FinalizationRegistry((scope) => {
-    scope.close(Exit.unit()).unsafeRunAsync
+    scope.close(Exit.unit()).unsafeRun()
   }),
   entries: new WeakMap(),
 })
