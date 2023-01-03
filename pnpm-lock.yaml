@@ -30,16 +30,15 @@ importers:
   packages/react:
     specifiers:
       '@effect/io': ~0.0.47
-      '@effect/stream': ^0.0.3
+      '@effect/stream': ~0.0.5
       '@fp-ts/data': ~0.0.31
       '@types/react': ^18.0.26
       prettier: ^2.8.1
       react: ^18.2.0
       typescript: https://github.com/0x706b/typescript/raw/043313ca8f/typescript-5.0.0-tsplus.20221227.tgz
-    dependencies:
-      '@effect/stream': 0.0.3
     devDependencies:
       '@effect/io': 0.0.48
+      '@effect/stream': 0.0.5
       '@fp-ts/data': 0.0.31
       '@types/react': 18.0.26
       prettier: 2.8.1
@@ -79,23 +78,15 @@ packages:
     dependencies:
       '@fp-ts/core': 0.0.11
       '@fp-ts/data': 0.0.31
+    dev: true
 
-  /@effect/stm/0.0.6:
-    resolution: {integrity: sha512-E0rgPfA4BX87xizZAoqPqTp7ctxqIB/ti9Emg/uQslkZY/knVVv6VXlM+OZbg3DmmjgxC80+T9fhgBfdDf3DgQ==}
+  /@effect/stream/0.0.5:
+    resolution: {integrity: sha512-hDjxMaMkYz9zfqpjhUeP9fEq5S9nfZJgyhwNnvcEKJAoU6ZLDQPoaPtCZrBARUC01VmmbqRX05BagCphdApo3g==}
     dependencies:
       '@effect/io': 0.0.48
       '@fp-ts/core': 0.0.11
       '@fp-ts/data': 0.0.31
-    dev: false
-
-  /@effect/stream/0.0.3:
-    resolution: {integrity: sha512-7uX5ViddHimNMfyNsCWK73cuX5t528uCIPrygreLc8Fd5vlawhj8bAVQ8N2YzHznXuV29KYSVNoNi7bUSmdsAg==}
-    dependencies:
-      '@effect/io': 0.0.48
-      '@effect/stm': 0.0.6
-      '@fp-ts/core': 0.0.11
-      '@fp-ts/data': 0.0.31
-    dev: false
+    dev: true
 
   /@fp-ts/core/0.0.11:
     resolution: {integrity: sha512-BCAJBYzghwoJpcUOARJ1tui50HoYJFlV2pJlVMlsEkDFhD8MTtq8xQVpZCRF66RmtkxtGBYINCQ+5H1lRaL35Q==}

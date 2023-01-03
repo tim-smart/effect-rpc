@@ -18,7 +18,10 @@ import {
   StreamSuspenseProvider,
   makeUseStreamSuspense,
 } from "./useStreamSuspense.js"
-import { useSubscriptionRef } from "./useSubscriptionRef.js"
+import {
+  useSubscriptionRef,
+  makeUseSubscriptionRefEffect,
+} from "./useSubscriptionRef.js"
 import { makeUseStream, makeUseStreamLatest } from "./useStream.js"
 
 export const makeFromLayer = <R, E>(layer: Layer.Layer<never, E, R>) => {
@@ -51,6 +54,7 @@ export const makeFromRuntime = <R, E>(
     useEffectSuspense: makeUseEffectSuspense(RuntimeContext),
     useInvalidateEffect,
     useSubscriptionRef,
+    useSubscriptionRefEffect: makeUseSubscriptionRefEffect(RuntimeContext),
     useStreamSuspense: makeUseStreamSuspense(RuntimeContext),
     useStream: makeUseStream(RuntimeContext),
     useStreamLatest: makeUseStreamLatest(RuntimeContext),

@@ -53,4 +53,3 @@ export const useInvalidateEffect = (
   return () => cache.delete(effect)
 }
 
-useInvalidateEffect(Effect.succeed(1))
