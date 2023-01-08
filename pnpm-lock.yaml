@@ -29,17 +29,17 @@ importers:
 
   packages/react:
     specifiers:
-      '@effect/io': ~0.0.47
-      '@effect/stream': ~0.0.5
-      '@fp-ts/data': ~0.0.31
+      '@effect/io': ~0.0.60
+      '@effect/stream': ~0.0.10
+      '@fp-ts/data': ~0.0.36
       '@types/react': ^18.0.26
       prettier: ^2.8.1
       react: ^18.2.0
       typescript: https://github.com/0x706b/typescript/raw/043313ca8f/typescript-5.0.0-tsplus.20221227.tgz
     devDependencies:
-      '@effect/io': 0.0.48
-      '@effect/stream': 0.0.5
-      '@fp-ts/data': 0.0.31
+      '@effect/io': 0.0.60
+      '@effect/stream': 0.0.10
+      '@fp-ts/data': 0.0.36
       '@types/react': 18.0.26
       prettier: 2.8.1
       react: 18.2.0
@@ -47,22 +47,22 @@ importers:
 
   packages/router:
     specifiers:
-      '@effect/io': ~0.0.47
-      '@fp-ts/data': ~0.0.30
+      '@effect/io': ~0.0.60
+      '@fp-ts/data': ~0.0.36
       '@tsplus/runtime': ^0.1.10
       '@tsplus/stdlib': ^0.2.8
       '@types/node': ^18.11.13
       prettier: ^2.8.1
-      typescript: https://cdn.jsdelivr.net/npm/@tsplus/installer/compiler/typescript.tgz
+      typescript: https://cdn.jsdelivr.net/npm/@tsplus/installer@0.0.162/compiler/typescript.tgz
     dependencies:
       '@tsplus/stdlib': 0.2.8
     devDependencies:
-      '@effect/io': 0.0.48
-      '@fp-ts/data': 0.0.30
+      '@effect/io': 0.0.60
+      '@fp-ts/data': 0.0.36
       '@tsplus/runtime': 0.1.10
       '@types/node': 18.11.13
       prettier: 2.8.1
-      typescript: '@cdn.jsdelivr.net/npm/@tsplus/installer/compiler/typescript.tgz'
+      typescript: '@cdn.jsdelivr.net/npm/@tsplus/installer@0.0.162/compiler/typescript.tgz'
 
 packages:
 
@@ -73,19 +73,19 @@ packages:
       '@fp-ts/data': 0.0.31
     dev: false
 
-  /@effect/io/0.0.48:
-    resolution: {integrity: sha512-KZnfgCDGIUJGsx5LNIBPfDKk21muPV97Nsjsuwaeazaceiphikf9UhQZ1elYayEXiwqQ+yyESNp2FQno4F8m6g==}
+  /@effect/io/0.0.60:
+    resolution: {integrity: sha512-5rJzjOiXV3b/Njezyyi1SQiu25NyocD20hT716ha86o+zBonYleArxbrD7Olls+SRjKaHpL4itaxlzNOHB45rQ==}
     dependencies:
       '@fp-ts/core': 0.0.11
-      '@fp-ts/data': 0.0.31
+      '@fp-ts/data': 0.0.36
     dev: true
 
-  /@effect/stream/0.0.5:
-    resolution: {integrity: sha512-hDjxMaMkYz9zfqpjhUeP9fEq5S9nfZJgyhwNnvcEKJAoU6ZLDQPoaPtCZrBARUC01VmmbqRX05BagCphdApo3g==}
+  /@effect/stream/0.0.10:
+    resolution: {integrity: sha512-TcDscpJ4lTCtwKhqhTcDRlcUX7S3838Ibtr2hQylrL5gTEZfORd5sQT3kSkT8VxvdItl2kmwDsXHbY5TXUM9Jg==}
     dependencies:
-      '@effect/io': 0.0.48
+      '@effect/io': 0.0.60
       '@fp-ts/core': 0.0.11
-      '@fp-ts/data': 0.0.31
+      '@fp-ts/data': 0.0.36
     dev: true
 
   /@fp-ts/core/0.0.11:
@@ -95,11 +95,19 @@ packages:
     resolution: {integrity: sha512-nMRNrNDn6ebleNtWI8YKf7+VzkLjaSedeU84KMttBrX5MlFIcbrLzn+OzspY8q46kkqBJTnmc3tVXxpU0p70Tw==}
     dependencies:
       '@fp-ts/core': 0.0.11
+    dev: false
 
   /@fp-ts/data/0.0.31:
     resolution: {integrity: sha512-slC6xqd/t+GmWkgNSW/UdPvtLKnBbIW6ra1E8G8E0aF2NFcjLeNHABL/+FMpQBMP+Q3ySOvm/oUSc8TCA4cC+A==}
     dependencies:
       '@fp-ts/core': 0.0.11
+    dev: false
+
+  /@fp-ts/data/0.0.36:
+    resolution: {integrity: sha512-uC8S69OO+KyXrVTQhDr+JWXmex9blTwZcwG9BcxflPnytHA3lU8BxMz0DjxgSpeWzoGJIZ9F5L6bbwCnvcLeEA==}
+    dependencies:
+      '@fp-ts/core': 0.0.11
+    dev: true
 
   /@tsplus/runtime/0.1.10:
     resolution: {integrity: sha512-4D1w2WYL7w+wBcbfIhqCOtmIhU3Jyc/FbxR9imQLcTqw05sr9GKTWkXkv5Q77MHFv5MkAP5bdSkKhgsHhGhiWw==}
@@ -610,6 +618,14 @@ packages:
     resolution: {tarball: https://cdn.jsdelivr.net/npm/@tsplus/installer/compiler/typescript.tgz}
     name: typescript
     version: 5.0.0-tsplus.20221127
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: true
+
+  '@cdn.jsdelivr.net/npm/@tsplus/installer@0.0.162/compiler/typescript.tgz':
+    resolution: {tarball: https://cdn.jsdelivr.net/npm/@tsplus/installer@0.0.162/compiler/typescript.tgz}
+    name: typescript
+    version: 5.0.0-tsplus.20230108
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
