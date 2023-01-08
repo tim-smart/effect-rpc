@@ -19,8 +19,8 @@ import {
   makeUseStreamSuspense,
 } from "./useStreamSuspense.js"
 import {
-  useSubscriptionRef,
   makeUseSubscriptionRefEffect,
+  makeUseSubscriptionRef,
 } from "./useSubscriptionRef.js"
 import { makeUseStream, makeUseStreamLatest } from "./useStream.js"
 
@@ -53,7 +53,7 @@ export const makeFromRuntime = <R, E>(
     useEffectWithResult: makeUseEffectWithResult(RuntimeContext),
     useEffectSuspense: makeUseEffectSuspense(RuntimeContext),
     useInvalidateEffect,
-    useSubscriptionRef,
+    useSubscriptionRef: makeUseSubscriptionRef(RuntimeContext),
     useSubscriptionRefEffect: makeUseSubscriptionRefEffect(RuntimeContext),
     useStreamSuspense: makeUseStreamSuspense(RuntimeContext),
     useStream: makeUseStream(RuntimeContext),

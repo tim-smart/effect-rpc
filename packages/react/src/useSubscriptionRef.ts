@@ -1,35 +1,36 @@
-import * as SR from "@effect/stream/SubscriptionRef"
 import { useEffect, useState } from "react"
-import { RuntimeContext } from "./runtime.js"
+import { RuntimeContext, useEffectRunner } from "./runtime.js"
 import { makeUseEffectSuspense } from "./useEffectSuspense.js"
 
-export const useSubscriptionRef = <A>(ref: SR.SubscriptionRef<A>) => {
-  const [value, setValue] = useState(() => ref.get.unsafeRunSync)
+export const makeUseSubscriptionRef =
+  <R, EC>(runtime: RuntimeContext<R, EC>) =>
+  <A>(ref: SubscriptionRef<A>) => {
+    const runner = useEffectRunner(runtime)
+    const [value, setValue] = useState(() => ref.get.unsafeRunSync)
 
-  useEffect(() => {
-    const interrupt = ref.changes
-      .tap((a) =>
+    useEffect(() => {
+      const effect = ref.changes.tap((a) =>
         Effect.sync(() => {
           setValue(a)
         }),
-      )
-      .runDrain.unsafeRun((exit) => {
+      ).runDrain
+
+      return runner(effect, (exit) => {
         if (exit.isFailure() && !exit.isInterrupted()) {
           console.error("useSubscriptionRef", exit.cause.pretty())
         }
       })
+    }, [ref])
 
-    return () => interrupt()
-  }, [ref])
-
-  return value
-}
+    return value
+  }
 
 export const makeUseSubscriptionRefEffect = <R, EC>(
   runtime: RuntimeContext<R, EC>,
 ) => {
   const useEffectSuspense = makeUseEffectSuspense(runtime)
-  return <E, A>(refEffect: Effect<R, E, SR.SubscriptionRef<A>>) => {
+  const useSubscriptionRef = makeUseSubscriptionRef(runtime)
+  return <E, A>(refEffect: Effect<R, E, SubscriptionRef<A>>) => {
     const ref = useEffectSuspense(refEffect)
     return useSubscriptionRef(ref)
   }

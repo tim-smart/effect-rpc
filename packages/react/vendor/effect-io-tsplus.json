@@ -1951,6 +1951,17 @@
       ]
     },
     {
+      "definitionName": "fromEnv",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Config/Provider.Ops",
+          "name": "fromEnv"
+        }
+      ]
+    },
+    {
       "definitionName": "fromFlat",
       "definitionKind": "const",
       "extensions": [
@@ -1969,17 +1980,6 @@
           "kind": "static",
           "typeName": "effect/io/Config/Provider.Ops",
           "name": "fromMap"
-        }
-      ]
-    },
-    {
-      "definitionName": "env",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "static",
-          "typeName": "effect/io/Config/Provider.Ops",
-          "name": "env"
         }
       ]
     },
@@ -2786,6 +2786,69 @@
       ]
     }
   ],
+  "@effect/io/Metric/Label": [
+    {
+      "definitionName": "MetricLabel",
+      "definitionKind": "interface",
+      "extensions": [
+        {
+          "kind": "type",
+          "typeName": "effect/io/Metric/Label"
+        },
+        {
+          "kind": "companion",
+          "typeName": "effect/io/Metric/Label.Ops"
+        }
+      ]
+    },
+    {
+      "definitionName": "MetricLabelTypeId",
+      "definitionKind": "type",
+      "extensions": [
+        {
+          "kind": "type",
+          "typeName": "effect/io/Metric/Label.MetricLabelTypeId"
+        },
+        {
+          "kind": "companion",
+          "typeName": "effect/io/Metric/Label.MetricLabelTypeId.Ops"
+        }
+      ]
+    },
+    {
+      "definitionName": "make",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Metric/Label.Ops",
+          "name": "make"
+        }
+      ]
+    },
+    {
+      "definitionName": "isMetricLabel",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Metric/Label.Ops",
+          "name": "isMetricLabel"
+        }
+      ]
+    },
+    {
+      "definitionName": "MetricLabelTypeId",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Metric/Label.MetricLabelTypeId.Ops",
+          "name": "MetricLabelTypeId"
+        }
+      ]
+    }
+  ],
   "@effect/io/Metric/Boundaries": [
     {
       "definitionName": "MetricBoundaries",
@@ -3408,69 +3471,6 @@
           "kind": "getter",
           "typeName": "effect/io/Metric/Boundaries",
           "name": "histogram"
-        }
-      ]
-    }
-  ],
-  "@effect/io/Metric/Label": [
-    {
-      "definitionName": "MetricLabel",
-      "definitionKind": "interface",
-      "extensions": [
-        {
-          "kind": "type",
-          "typeName": "effect/io/Metric/Label"
-        },
-        {
-          "kind": "companion",
-          "typeName": "effect/io/Metric/Label.Ops"
-        }
-      ]
-    },
-    {
-      "definitionName": "MetricLabelTypeId",
-      "definitionKind": "type",
-      "extensions": [
-        {
-          "kind": "type",
-          "typeName": "effect/io/Metric/Label.MetricLabelTypeId"
-        },
-        {
-          "kind": "companion",
-          "typeName": "effect/io/Metric/Label.MetricLabelTypeId.Ops"
-        }
-      ]
-    },
-    {
-      "definitionName": "make",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "static",
-          "typeName": "effect/io/Metric/Label.Ops",
-          "name": "make"
-        }
-      ]
-    },
-    {
-      "definitionName": "isMetricLabel",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "static",
-          "typeName": "effect/io/Metric/Label.Ops",
-          "name": "isMetricLabel"
-        }
-      ]
-    },
-    {
-      "definitionName": "MetricLabelTypeId",
-      "definitionKind": "const",
-      "extensions": [
-        {
-          "kind": "static",
-          "typeName": "effect/io/Metric/Label.MetricLabelTypeId.Ops",
-          "name": "MetricLabelTypeId"
         }
       ]
     }
@@ -8251,6 +8251,17 @@
       ]
     },
     {
+      "definitionName": "currentTags",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/FiberRef.Ops",
+          "name": "currentTags"
+        }
+      ]
+    },
+    {
       "definitionName": "interruptedCause",
       "definitionKind": "const",
       "extensions": [
@@ -10025,6 +10036,20 @@
       ]
     },
     {
+      "definitionName": "Permit",
+      "definitionKind": "interface",
+      "extensions": [
+        {
+          "kind": "type",
+          "typeName": "effect/io/Effect.Permit"
+        },
+        {
+          "kind": "companion",
+          "typeName": "effect/io/Effect.Permit.Ops"
+        }
+      ]
+    },
+    {
       "definitionName": "Semaphore",
       "definitionKind": "interface",
       "extensions": [
@@ -11028,6 +11053,50 @@
           "kind": "static",
           "typeName": "effect/io/Effect.Ops",
           "name": "sync"
+        }
+      ]
+    },
+    {
+      "definitionName": "taggedScoped",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Effect.Ops",
+          "name": "taggedScoped"
+        }
+      ]
+    },
+    {
+      "definitionName": "taggedScopedWithLabels",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Effect.Ops",
+          "name": "taggedScopedWithLabels"
+        }
+      ]
+    },
+    {
+      "definitionName": "taggedScopedWithLabelSet",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Effect.Ops",
+          "name": "taggedScopedWithLabelSet"
+        }
+      ]
+    },
+    {
+      "definitionName": "tags",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "static",
+          "typeName": "effect/io/Effect.Ops",
+          "name": "tags"
         }
       ]
     },
@@ -12928,6 +12997,39 @@
       ]
     },
     {
+      "definitionName": "tagged",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "pipeable",
+          "typeName": "effect/io/Effect",
+          "name": "tagged"
+        }
+      ]
+    },
+    {
+      "definitionName": "taggedWithLabels",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "pipeable",
+          "typeName": "effect/io/Effect",
+          "name": "taggedWithLabels"
+        }
+      ]
+    },
+    {
+      "definitionName": "taggedWithLabelSet",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "pipeable",
+          "typeName": "effect/io/Effect",
+          "name": "taggedWithLabelSet"
+        }
+      ]
+    },
+    {
       "definitionName": "tap",
       "definitionKind": "const",
       "extensions": [
@@ -13317,6 +13419,28 @@
           "kind": "pipeable",
           "typeName": "effect/io/Effect",
           "name": "whenEffect"
+        }
+      ]
+    },
+    {
+      "definitionName": "whenFiberRef",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "pipeable",
+          "typeName": "effect/io/Effect",
+          "name": "whenFiberRef"
+        }
+      ]
+    },
+    {
+      "definitionName": "whenRef",
+      "definitionKind": "const",
+      "extensions": [
+        {
+          "kind": "pipeable",
+          "typeName": "effect/io/Effect",
+          "name": "whenRef"
         }
       ]
     },

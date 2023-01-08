@@ -5,7 +5,7 @@ import React, {
   useMemo,
 } from "react"
 import { RuntimeContext, useEffectRunnerPromise } from "./runtime.js"
-import { useSubscriptionRef } from "./useSubscriptionRef.js"
+import { makeUseSubscriptionRef } from "./useSubscriptionRef.js"
 
 export interface Cache {
   registry: FinalizationRegistry<CloseableScope>
@@ -97,9 +97,12 @@ const streamToPull = <R, E, A>(stream: Stream<R, E, A>) =>
     return [ref, pullAndUpdate] as const
   })
 
-export const makeUseStreamSuspense =
-  <R, EC>(runtime: RuntimeContext<R, EC>) =>
-  <E, A>(stream: Stream<R, E, A>) => {
+export const makeUseStreamSuspense = <R, EC>(
+  runtime: RuntimeContext<R, EC>,
+) => {
+  const useSubscriptionRef = makeUseSubscriptionRef(runtime)
+
+  return <E, A>(stream: Stream<R, E, A>) => {
     const runner = useEffectRunnerPromise(runtime)
     const { entries, registry } = useContext(StreamSuspenseContext)
     const entry = entries.get(stream) as CacheEntry<E, A>
@@ -138,3 +141,4 @@ export const makeUseStreamSuspense =
       value: value.getOrThrow(() => "left"),
     }
   }
+}

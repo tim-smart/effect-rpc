@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { RuntimeContext, useEffectRunner } from "./runtime.js"
-import { useSubscriptionRef } from "./useSubscriptionRef.js"
+import { makeUseSubscriptionRef } from "./useSubscriptionRef.js"
 
 export type StreamResult<E, A> =
   | { _tag: "Initial" }
@@ -117,9 +117,10 @@ export const makeUseStream =
     return { ...flatten(value), pull }
   }
 
-export const makeUseStreamLatest =
-  <R, EC>(runtime: RuntimeContext<R, EC>) =>
-  <E, A>(stream: Stream<R, E, A>) => {
+export const makeUseStreamLatest = <R, EC>(runtime: RuntimeContext<R, EC>) => {
+  const useSubscriptionRef = makeUseSubscriptionRef(runtime)
+
+  return <E, A>(stream: Stream<R, E, A>) => {
     const runner = useEffectRunner(runtime)
     const ref = useMemo(
       () =>
@@ -161,3 +162,4 @@ export const makeUseStreamLatest =
 
     return flatten(useSubscriptionRef(ref))
   }
+}
