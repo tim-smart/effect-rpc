@@ -24,7 +24,7 @@
     "@types/react": "^18.0.26",
     "prettier": "^2.8.1",
     "react": "^18.2.0",
-    "typescript": "https://github.com/0x706b/typescript/raw/043313ca8f/typescript-5.0.0-tsplus.20221227.tgz"
+    "typescript": "https://cdn.jsdelivr.net/npm/@tsplus/installer@0.0.163/compiler/typescript.tgz"
   },
   "peerDependencies": {
     "@effect/io": "~0.0.42",

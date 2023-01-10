@@ -46,7 +46,8 @@ export const makeFromRuntime = <R, E>(
   return {
     Providers,
     SuspenseProvider: EffectSuspenseProvider,
-    EnvContext: RuntimeContext,
+    StreamSuspenseProvider,
+    RuntimeContext,
     useEffectIo: makeUseEffectIo(RuntimeContext),
     useEffectScoped: makeUseEffectScoped(RuntimeContext),
     useEffectRepeat: makeUseEffectRepeat(RuntimeContext),
