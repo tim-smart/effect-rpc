@@ -13,7 +13,6 @@
     ".": "./dist/index.js",
     "./client": "./dist/client.js",
     "./server": "./dist/server.js",
-    "./transport": "./dist/transport.js",
     "./tsplus/client": "./dist/tsplus/client.js",
     "./tsplus/server": "./dist/tsplus/server.js",
     "./*": "./dist/*.js"
